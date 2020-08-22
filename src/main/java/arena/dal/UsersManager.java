@@ -2,6 +2,8 @@ package arena.dal;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,7 +17,7 @@ import org.json.simple.JSONObject;
 
 
 
-public final class UseresManager {
+public final class UsersManager {
 
 	//----------------------------------------Boolean----------------------------------------
 
@@ -30,6 +32,7 @@ public final class UseresManager {
 		Object[] values = Authentication.checkParameters(request);
 		
 		// Email validation
+		if (values == null) throw new AssertionError();
 		String mailTxt = (String) values[0];
 		if (emailValidation(mailTxt)) {
 			String q = String.format("Select email from users where email = '%s';", mailTxt);
@@ -37,8 +40,9 @@ public final class UseresManager {
 				return insertUser(new Users(mailTxt, (String) values[1], (String) values[2], (String) values[3],
 						Integer.parseInt((String) values[4]), (String) values[5], (String) values[6], Integer.parseInt((String)values[7])), (String) values[8]);
 			else if(DBManager.isExists(q) ==1 ) {
-				JSONObject jsonError = new JSONObject();
-				jsonError.put("Error","User already exists");
+				Map<String,String> jsonMap = new HashMap<>();
+				jsonMap.put("Error","User already exists");
+				JSONObject jsonError = new JSONObject(jsonMap);
 				response.getWriter().append(jsonError.toJSONString());
 			}
 		}
@@ -47,7 +51,7 @@ public final class UseresManager {
 
 	private static boolean insertUser(Users user, String pass) {
 		/*
-		 * !!!	PLEASE DONT USE THIS FUNCTION WITH OUT CALL THE BEFORE FUNCITON (beforeInsertUser)	!!!
+		 * !!!	PLEASE DONT USE THIS FUNCTION WITH OUT CALL THE BEFORE FUNCTION (beforeInsertUser)	!!!
 		 * This method is get a User object and password, 
 		 * first it encrypt the password, 
 		 * second it create a new user in the database, and get the new userId 
@@ -68,7 +72,6 @@ public final class UseresManager {
 			try {
 				user.setId(res.getInt("id"));
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			});
@@ -76,7 +79,7 @@ public final class UseresManager {
 			if (user.getId() > 0) {
 				String passwordQuery = String.format("INSERT INTO passwords (userId,hashedPassword) value ('%d','%s');",
 						user.getId(), p);
-				return (DBManager.runExecute(passwordQuery) > 0) ? true : false;
+				return DBManager.runExecute(passwordQuery) > 0;
 			}
 			
 		}
@@ -107,15 +110,12 @@ public final class UseresManager {
 		
 		String p = Encryptor.encryptThisString(newPassword);
 		String query = String.format("UPDATE passwords SET hashedPassword = '%s' WHERE userId = %d;",p,returnUserId(emailTxt).getId());
-		if(DBManager.runExecute(query) > 0) {
-			return true;
-		}
-		return false;
+		return DBManager.runExecute(query) > 0;
 	}
 	
 	//----------------------------------------Users----------------------------------------
 	
-	public static Users checkAutacntication(String emailTxt, String password) {
+	public static Users checkAuthentication(String emailTxt, String password) {
 		/*
 		 * This function get an email and password and check if there is a such 
 		 * user in the DB and return it as an JsonObject. 

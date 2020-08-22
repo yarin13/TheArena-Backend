@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 public final class QuestionManager {
 
 	public static String questions ;
-	public static ArrayList<String> answers = new ArrayList<String>();
+	public static ArrayList<String> answers = new ArrayList<>();
 	public static JSONObject json = new JSONObject();
 
 	//------------------------------------------ArrayList<Questions>------------------------------------------
@@ -21,7 +21,7 @@ public final class QuestionManager {
 		
 		json.clear();
 		
-		String query = String.format("select questionId,question,answerNumberOne,answerNumberTwo,answerNumberThree,answerNumberFour from questions join possibleAnswer on possibleAnswer.questionId = questions.id;");
+		String query = "select questionId,question,answerNumberOne,answerNumberTwo,answerNumberThree,answerNumberFour from questions join possibleAnswer on possibleAnswer.questionId = questions.id;";
 
 		DBManager.runSelect(query, (res) -> {
 			try {
@@ -33,7 +33,7 @@ public final class QuestionManager {
 				answers.add(res.getString("answerNumberThree"));
 				answers.add(res.getString("answerNumberFour"));
 				questions = (res.getString("question"));
-				json.put(questions, new ArrayList<String>(answers));
+				json.put(questions, new ArrayList<>(answers));
 				
 			} catch (SQLException e) {
 				answers.clear();

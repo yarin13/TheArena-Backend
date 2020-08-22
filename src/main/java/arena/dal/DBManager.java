@@ -36,7 +36,7 @@ public final class DBManager {
 
 		try {
 			connection = DBManager.getConnection();			 //initializing connection
-			statement = connection.createStatement();		
+			statement = connection.createStatement();
 			ResultSet res = statement.executeQuery(query);
 					
 			while(res.next()) {
@@ -154,7 +154,7 @@ public final class DBManager {
 			statement = connection.createStatement();
 			ResultSet res=statement.executeQuery(query);
 			
-			while(res.next()) {
+			if(res.next()) {
 				return new Users(res.getString("email"),res.getString("firstName"),res.getString("lastName"),res.getString("phoneNumber")
 						,res.getInt("age"),res.getString("gender"),res.getString("interestedin"),res.getInt("score"));
 			}
@@ -179,7 +179,7 @@ public final class DBManager {
 			statement = connection.createStatement();
 			ResultSet res=statement.executeQuery(query);
 			
-			while(res.next()) {
+			if(res.next()) {
 				return new Users(res.getInt("id"),res.getString("email"),res.getString("firstName"),res.getString("lastName"),res.getString("phoneNumber")
 						,res.getInt("age"),res.getString("gender"),res.getString("interestedin"),res.getInt("score"));
 			}

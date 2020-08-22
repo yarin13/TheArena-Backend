@@ -19,15 +19,15 @@ public final class Encryptor {
 			BigInteger no = new BigInteger(1, messageDigest);
 
 			// Convert message digest into hex value
-			String hashtext = no.toString(16);
+			StringBuilder hashtext = new StringBuilder(no.toString(16));
 
 			// Add preceding 0s to make it 32 bit
 			while (hashtext.length() < 32) {
-				hashtext = "0" + hashtext;
+				hashtext.insert(0, "0");
 			}
 
 			// return the HashText
-			return hashtext;
+			return hashtext.toString();
 		}
 
 		// For specifying wrong message digest algorithms

@@ -1,16 +1,17 @@
 package arena.servlets;
 
-import arena.dal.UseresManager;
+import arena.dal.UsersManager;
 import arena.bll.Users;
 import org.json.simple.JSONObject;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet("/Authentication")
 public class Authentication extends HttpServlet {
@@ -21,32 +22,30 @@ public class Authentication extends HttpServlet {
      * To reset a user password			   |PUT: http://localhost:8080/TheArenaServler/Authentication	|Not yet ready
      */
     private static final long serialVersionUID = 1L;
-    private static JSONObject res =  new JSONObject();
+
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
      *      response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
+        Map<String,String> jsonMap = new HashMap<>();
+        JSONObject res ;
         if(checkHeader(request)) {
-            Users signInUser = UseresManager.checkAutacntication(request.getHeader("email"),
+            Users signInUser = UsersManager.checkAuthentication(request.getHeader("email"),
                     request.getHeader("password"));
-            res.clear();
+
             if (signInUser != null) {
-                res.put("email", signInUser.getEmail().toString());
-                response.getWriter().append(res.toJSONString());
+                jsonMap.put("email", signInUser.getEmail());
             } else {
-                res.put("Error", "User is not exists");
-                response.getWriter().append(res.toJSONString());
+                jsonMap.put("Error", "User is not exists");
             }
         }else {
-            res.clear();
-            res.put("Error", "Please check your request!");
-            response.getWriter().append(res.toJSONString());
+            jsonMap.put("Error", "Please check your request!");
         }
-        return;
-
+        res = new JSONObject(jsonMap);
+        response.getWriter().append(res.toJSONString());
     }
 
     /**
@@ -54,40 +53,46 @@ public class Authentication extends HttpServlet {
      *      response)
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        res.clear();
+            throws IOException {
+        Map<String,String> jsonMap = new HashMap<>();
+        JSONObject res;
         if (checkParameters(request, response))
-            UseresManager.beforeInsertUser(request , response);
+            if (UsersManager.beforeInsertUser(request , response)){
+                jsonMap.put("Success","New user is created!");
+                res = new JSONObject(jsonMap);
+                response.getWriter().append(res.toJSONString());
+            }
     }
 
     /**
      * @see HttpServlet#doPut(HttpServletRequest, HttpServletResponse)
      */
-    protected void doPut(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        res.clear();
-        //need to check how to get request parameters ....
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) {
+        //TODO: check parameters from the request and reset user password.
+
     }
 
     //----------------------------------------Other----------------------------------------
 
     protected boolean checkParameters(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        res.clear();
+            throws IOException {
+        Map<String,String> jsonMap = new HashMap<>();
+        JSONObject res ;
         Object[] paramsObjects = request.getParameterMap().keySet().toArray();
-        ArrayList<String> values = new ArrayList<String>();
+        ArrayList<String> values = new ArrayList<>();
 
-        for (int i = 0; i < paramsObjects.length; i++) {
-            if (request.getParameter((String) paramsObjects[i]) != null
-                    && !request.getParameter((String) paramsObjects[i]).isBlank()) {
-                values.add(request.getParameter((String) paramsObjects[i]));
+        for (Object paramsObject : paramsObjects) {
+            if (request.getParameter((String) paramsObject) != null
+                    && !request.getParameter((String) paramsObject).isBlank()) {
+                values.add(request.getParameter((String) paramsObject));
             } else {
                 values.add(null);
             }
         }
 
         if (values.contains(null) || values.isEmpty()) {
-            res.put("Error", "Missing some fields");
+            jsonMap.put("Error", "Missing some fields");
+            res = new JSONObject(jsonMap);
             response.getWriter().append(res.toJSONString());
             return false;
         }
@@ -107,8 +112,8 @@ public class Authentication extends HttpServlet {
         }
 
         // Check if there is any blanks or null in the fields..
-        for (int i = 0; i < values.length; i++)
-            if (values[i] == null)
+        for (Object value : values)
+            if (value == null)
                 return null;
 
         return values;
@@ -120,10 +125,8 @@ public class Authentication extends HttpServlet {
         String pass = request.getHeader("password");
 
         if (email != null)
-            if ((UseresManager.emailValidation(email) && pass != null && !pass.isBlank()))
-                return true;
+            return UsersManager.emailValidation(email) && pass != null && !pass.isBlank();
         return false;
 
     }
-
 }
