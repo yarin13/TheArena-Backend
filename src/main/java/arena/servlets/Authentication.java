@@ -32,20 +32,25 @@ public class Authentication extends HttpServlet {
             throws IOException {
         Map<String,String> jsonMap = new HashMap<>();
         JSONObject res ;
+        String answer;
         if(checkHeader(request)) {
             Users signInUser = UsersManager.checkAuthentication(request.getHeader("email"),
                     request.getHeader("password"));
 
             if (signInUser != null) {
-                jsonMap.put("email", signInUser.getEmail());
+                jsonMap.put("Success", "success");
+                answer="success";
             } else {
                 jsonMap.put("Error", "User is not exists");
+                answer ="not exist";
             }
         }else {
             jsonMap.put("Error", "Please check your request!");
+            answer="error";
         }
         res = new JSONObject(jsonMap);
-        response.getWriter().append(res.toJSONString());
+       response.getWriter().append(res.toJSONString());
+        //response.getWriter().append(answer);
     }
 
     /**
@@ -56,11 +61,14 @@ public class Authentication extends HttpServlet {
             throws IOException {
         Map<String,String> jsonMap = new HashMap<>();
         JSONObject res;
+        String ans;
         if (checkParameters(request, response))
             if (UsersManager.beforeInsertUser(request , response)){
                 jsonMap.put("Success","New user is created!");
+                ans = "success";
                 res = new JSONObject(jsonMap);
-                response.getWriter().append(res.toJSONString());
+                //response.getWriter().append(res.toJSONString());
+                response.getWriter().append(ans);
             }
     }
 
