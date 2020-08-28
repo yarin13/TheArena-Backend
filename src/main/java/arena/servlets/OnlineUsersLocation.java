@@ -25,9 +25,7 @@ public class OnlineUsersLocation extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private static JSONArray jsonResponse = new JSONArray();
-	private String lat;
-	private String lng;
-       
+ 
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -39,9 +37,12 @@ public class OnlineUsersLocation extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		lat = request.getHeader("lat");
-		lng = request.getHeader("lng");
+	protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String lat = request.getHeader("lat");
+		String lng = request.getHeader("lng");
+		int userId = Integer.parseInt(request.getHeader("userId"));
+		
+		LocationManager.updateUsersStatus(userId, lat, lng);
 		
 		jsonResponse.clear();
 		LocationManager.getOnlineUsersLocation(lat,lng);
@@ -65,15 +66,14 @@ public class OnlineUsersLocation extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
+	
+//============================================================================	
+//	when the app goes to onDestroy set the user as offline
+//============================================================================	
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		int id = Integer.parseInt(request.getParameter("userId"));
-		String query = String.format("UPDATE usersStatus SET logedIn = false WHERE userId = %d;", id);
-		DBManager.runExecute(query);
-		
-		
-		
-		
+		LocationManager.logOutUser(id);
 		//doGet(request, response);
 	}
 
