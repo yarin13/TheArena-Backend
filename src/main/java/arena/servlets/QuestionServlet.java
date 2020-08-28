@@ -1,6 +1,6 @@
 package arena.servlets;
 
-import arena.dal.QuestionManager;
+import arena.bll.QuestionManager;
 import org.json.simple.JSONArray;
 
 import javax.servlet.ServletException;

@@ -38,7 +38,6 @@ public final class DBManager {
 			connection = DBManager.getConnection();			 //initializing connection
 			statement = connection.createStatement();
 			ResultSet res = statement.executeQuery(query);
-					
 			while(res.next()) {
 				con.accept(res);
 			}

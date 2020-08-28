@@ -1,6 +1,6 @@
 package arena.servlets;
 
-import arena.dal.UsersManager;
+import arena.bll.UsersManager;
 import arena.bll.Users;
 import org.json.simple.JSONObject;
 
