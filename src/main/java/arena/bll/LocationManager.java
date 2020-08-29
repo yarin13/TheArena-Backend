@@ -43,8 +43,6 @@ public final class LocationManager {
 				location.clear();
 				location.add(res.getString("lastLatitude"));
 				location.add(res.getString("lastLongtitude"));
-				
-				//json.put(res.getInt("userId", new ArrayList<>(location));
 				json.put(res.getInt("userId"), location);
 				
 			} catch (SQLException e) {
@@ -70,9 +68,9 @@ public final class LocationManager {
 //	every time the user requests to see other online users in his area
 //	this function should update his info as well
 //=======================================================	
-	public static void updateUsersStatus(int id, String lat,String lng) {
+	public static void updateUsersStatus(String mail, String lat,String lng) {
 		String query = String.format("UPDATE usersStatus SET logedIn = true, lastLatitude = %s,"
-				+ "lastLongtitude = %s WHERE userId = %d;", id,lat,lng);
+				+ "lastLongtitude = %s WHERE userId = %s;", mail,lat,lng);
 		DBManager.runExecute(query);
 	}
 	

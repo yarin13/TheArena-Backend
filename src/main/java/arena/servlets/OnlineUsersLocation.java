@@ -39,15 +39,17 @@ public class OnlineUsersLocation extends HttpServlet {
 	 */
 //=====================================================    
 //    added synchronized because of the jsonResponse
-//	  probably can be removed if we create the jsonResponse locally     
+//	  probably can be removed if we create the jsonResponse locally
+//    Headers to pass:"lat","lng","mail"
+//	  The get also updated the user current location in the DB    
 //=====================================================    
     
 	protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String lat = request.getHeader("lat");
 		String lng = request.getHeader("lng");
-		int userId = Integer.parseInt(request.getHeader("userId"));
+		String mail = request.getHeader("mail");
 		
-		LocationManager.updateUsersStatus(userId, lat, lng);
+		LocationManager.updateUsersStatus(mail, lat, lng);
 		
 		jsonResponse.clear();
 		LocationManager.getOnlineUsersLocation(lat,lng);
@@ -73,7 +75,7 @@ public class OnlineUsersLocation extends HttpServlet {
 	 */
 	
 //============================================================================	
-//	when the app goes to onDestroy set the user as offline
+//	when the app goes to onDestroy this POST sets the user as offline
 //============================================================================	
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
