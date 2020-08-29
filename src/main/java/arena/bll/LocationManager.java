@@ -69,8 +69,9 @@ public final class LocationManager {
 //	this function should update his info as well
 //=======================================================	
 	public static void updateUsersStatus(String mail, String lat,String lng) {
+		Users currentUser = UsersManager.returnUserId(mail);
 		String query = String.format("UPDATE usersStatus SET logedIn = true, lastLatitude = %s,"
-				+ "lastLongtitude = %s WHERE userId = %s;", mail,lat,lng);
+				+ "lastLongtitude = %s WHERE userId = %d;",lat,lng,currentUser.getId());
 		DBManager.runExecute(query);
 	}
 	

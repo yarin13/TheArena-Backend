@@ -157,7 +157,7 @@ public final class UsersManager {
 		}
 	}
 
-	private static Users returnUserId(String emailTxt) {
+	public static Users returnUserId(String emailTxt) {
 		/*
 		 * This function get an email as an argument and first check if there is such a user in the DB.
 		 * second it send a query to the GetUserInfo function.
