@@ -72,6 +72,7 @@ public final class UsersManager {
 			DBManager.runSelect(getNewUserId, (res) -> {
 			try {
 				user.setId(res.getInt("id"));
+				LocationManager.registerNewUser(user.getId());
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -100,7 +101,7 @@ public final class UsersManager {
 		return matcher.matches();
 	}
 	
-	public static boolean updatePassword(HttpServletRequest request,String emailTxt,String newPassword) {
+	public static boolean updatePassword(String emailTxt,String newPassword) {
 		/*
 		 * This function get a email and a new password,
 		 * need to use this function after the email was validated! 
@@ -108,10 +109,16 @@ public final class UsersManager {
 		 * this function return a boolean if the operation was succeed it will return true
 		 * else false;
 		 */
-		
 		String p = Encryptor.encryptThisString(newPassword);
-		String query = String.format("UPDATE passwords SET hashedPassword = '%s' WHERE userId = %d;",p,returnUserId(emailTxt).getId());
-		return DBManager.runExecute(query) > 0;
+		Users updatePasswordToThisUser = returnUserId(emailTxt);
+		if(updatePasswordToThisUser != null) {
+			String query = String.format("UPDATE passwords SET hashedPassword = '%s' WHERE userId = %d;",p,updatePasswordToThisUser.getId());
+			return DBManager.runExecute(query) > 0;
+		}
+		else 
+			return false;
+			
+		
 	}
 	
 	//----------------------------------------Users----------------------------------------
@@ -156,7 +163,7 @@ public final class UsersManager {
 		 * second it send a query to the GetUserInfo function.
 		 */
 		String query = String.format(
-				"select id from users where email = '%s';",
+				"select * from users where email = '%s';",
 				emailTxt);
 		if (DBManager.isExists(query) > 0) {
 			return DBManager.getUserInfoWithId(query);

@@ -37,6 +37,11 @@ public class OnlineUsersLocation extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+//=====================================================    
+//    added synchronized because of the jsonResponse
+//	  probably can be removed if we create the jsonResponse locally     
+//=====================================================    
+    
 	protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String lat = request.getHeader("lat");
 		String lng = request.getHeader("lng");

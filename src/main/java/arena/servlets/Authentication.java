@@ -17,9 +17,9 @@ import java.util.Map;
 public class Authentication extends HttpServlet {
     /*
      * -----------------------------------------------Authentication-----------------------------------------------
-     * To check if a single user is exists |GET: http://localhost:8080/TheArenaServler/Authentication 	|Done
-     * To register a new user 			   |POST:http://localhost:8080/TheArenaServler/Authentication	|Done
-     * To reset a user password			   |PUT: http://localhost:8080/TheArenaServler/Authentication	|Not yet ready
+     * To check if a single user is exists |GET: http://localhost:8080/TheArenaServlet/Authentication 	|Done
+     * To register a new user 			   |POST:http://localhost:8080/TheArenaServlet/Authentication	|Done
+     * To reset a user password			   |PUT: http://localhost:8080/TheArenaServlet/Authentication	|Done
      */
     private static final long serialVersionUID = 1L;
 
@@ -32,25 +32,21 @@ public class Authentication extends HttpServlet {
             throws IOException {
         Map<String,String> jsonMap = new HashMap<>();
         JSONObject res ;
-        String answer;
         if(checkHeader(request)) {
             Users signInUser = UsersManager.checkAuthentication(request.getHeader("email"),
                     request.getHeader("password"));
 
             if (signInUser != null) {
                 jsonMap.put("Success", "success");
-                answer="success";
             } else {
                 jsonMap.put("Error", "User is not exists");
-                answer ="not exist";
             }
         }else {
             jsonMap.put("Error", "Please check your request!");
-            answer="error";
         }
         res = new JSONObject(jsonMap);
        response.getWriter().append(res.toJSONString());
-        //response.getWriter().append(answer);
+        
     }
 
     /**
@@ -61,22 +57,40 @@ public class Authentication extends HttpServlet {
             throws IOException {
         Map<String,String> jsonMap = new HashMap<>();
         JSONObject res;
-        String ans;
         if (checkParameters(request, response))
             if (UsersManager.beforeInsertUser(request , response)){
                 jsonMap.put("Success","New user is created!");
-                ans = "success";
                 res = new JSONObject(jsonMap);
-                //response.getWriter().append(res.toJSONString());
-                response.getWriter().append(ans);
+                response.getWriter().append(res.toJSONString());
             }
     }
 
     /**
      * @see HttpServlet#doPut(HttpServletRequest, HttpServletResponse)
      */
+    
+//==================================
+    //PUT requests to update password
+   // If it runs into an error it returns error else returns nothing if everything went ok
+//==================================    
     protected void doPut(HttpServletRequest request, HttpServletResponse response) {
-        //TODO: check parameters from the request and reset user password.
+		 Map<String,String> jsonMap = new HashMap<>();
+	     JSONObject res;
+        
+    	String mail = request.getParameter("email");
+    	String newPassword = request.getParameter("newPassword");
+    	
+    	if(!UsersManager.updatePassword(mail, newPassword)) {
+
+    	        jsonMap.put("error","could not update password");
+                res = new JSONObject(jsonMap);
+                try {
+					response.getWriter().append(res.toJSONString());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+    	}
 
     }
 
