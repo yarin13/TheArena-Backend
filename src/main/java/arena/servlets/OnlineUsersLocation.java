@@ -19,7 +19,7 @@ public class OnlineUsersLocation extends HttpServlet {
 	
     /*
      * -------------------------------------------onlineUsersLocation-------------------------------------------
-     * GET: http://localhost:8080/TheArenaServler/onlineUsersLocation
+     * GET: http://localhost:8080/TheArenaServlet/onlineUsersLocation
      */
 	
 	
@@ -76,11 +76,12 @@ public class OnlineUsersLocation extends HttpServlet {
 	
 //============================================================================	
 //	when the app goes to onDestroy this POST sets the user as offline
+//  Headers to pass:"email"(the userName from the android) 	
 //============================================================================	
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		int id = Integer.parseInt(request.getParameter("userId"));
-		LocationManager.logOutUser(id);
+		String mail = request.getParameter("email");
+		LocationManager.logOutUser(mail);
 		//doGet(request, response);
 	}
 
