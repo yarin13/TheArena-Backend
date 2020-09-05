@@ -81,6 +81,10 @@ public class Users {
 		setIntrestedIn(intrestedIn);
 		setScore(score);
 	}
+	public Users(String email,String firstName) {
+		setEmail(email);
+		setFirstName(firstName);
+	}
 	//-------------All properties are included-------------
 	public Users(int id, String email,String firstName, String lastName, String phoneNumber, int age, String gender,String intrestedIn, int score) {
 		setId(id);

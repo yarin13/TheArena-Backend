@@ -1,9 +1,13 @@
 package arena.bll;
 
+import java.io.IOException;
+import java.net.http.HttpResponse;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
 
@@ -21,37 +25,74 @@ public final class LocationManager {
 	
 	
 	
-	public static synchronized void getOnlineUsersLocation(String lat,String lng) {
+	public static  void getOnlineUsersLocation(String mail,String lat,String lng) {
 //		this function get latitude and longitude from the user and sends back answer with all the people within
 //		500 meters(including the user itself)
 //		returns null if no one in his area is found
 
-		json.clear();
-		String query = String.format("		SELECT userId,lastLatitude,lastLongitude\r\n" + 
-				"		  , ( 6371000 * acos( cos( radians(%s) ) * cos( radians( lastLatitude ) ) * cos( radians( lastLongitude ) - radians(%s) ) + sin( radians(%s) ) * sin(radians(lastLatitude)) ) ) AS distance \r\n" + 
-				"		FROM \r\n" + 
-				"		  usersStatus\r\n" + 
-				"		where loggedIn = true\r\n" + 
-				"		HAVING \r\n" + 
-				"		  distance < 500;",lat,lng,lat);
 		
-		
+//		new Thread(new Runnable() {
+//			@Override
+//			public void run() {
 
 
-		DBManager.runSelect(query, (res) -> {
-			try {
-				location.clear();
-				location.add(res.getString("lastLatitude"));
-				location.add(res.getString("lastLongitude"));
-				json.put(res.getInt("userId"), location);
+					Users currentUser = UsersManager.returnUserId(mail);
+					String interestedIn = currentUser.getIntrestedIn();
+					int minScore = currentUser.getScore() - 11;
+					int maxScore = currentUser.getScore() + 11;
+					String query;
+					
+					if(interestedIn.equals("women")) {
+						query = String.format("SELECT userId,firstName,lastName,email,phoneNumber,age,lastLatitude,lastLongitude,"
+								+ " ( 6371000 * acos( cos( radians(%s) ) * cos( radians( lastLatitude ) ) * cos( radians( lastLongitude ) - radians(%s) ) + sin( radians(%s) ) * sin(radians(lastLatitude)) ) )"
+								+ " AS distance From users inner join usersStatus on users.id = usersStatus.userId"
+								+ " WHERE loggedIn = true AND "
+								+ "gender = 'female' "
+								+ "AND score BETWEEN %d AND %d "
+								+ "AND userId != %d "
+								+ "HAVING distance < 500;",lat,lng,lat,minScore,maxScore,currentUser.getId());
+						
+					}
+					else {
+						query = String.format("SELECT userId,firstName,lastName,email,phoneNumber,age,lastLatitude,lastLongitude,"
+								+ " ( 6371000 * acos( cos( radians(%s) ) * cos( radians( lastLatitude ) ) * cos( radians( lastLongitude ) - radians(%s) ) + sin( radians(%s) ) * sin(radians(lastLatitude)) ) )"
+								+ " AS distance From users inner join usersStatus on users.id = usersStatus.userId"
+								+ " WHERE loggedIn = true AND "
+								+ "gender = 'male' "
+								+ "AND score BETWEEN %d AND %d "
+								+ "AND userId != %d "
+								+ "HAVING distance < 500;",lat,lng,lat,minScore,maxScore,currentUser.getId());
+						
+					}
+					
+					json.clear();
+
+					DBManager.runSelect(query, (res) -> {
+						try {
+							
+							location.clear();
+							location.add(res.getString("firstName"));
+							location.add(res.getString("lastName"));
+							location.add(res.getString("email"));
+							location.add(res.getString("phoneNumber"));
+							location.add(res.getString("age"));
+							location.add(res.getString("lastLatitude"));
+							location.add(res.getString("lastLongitude"));
+							json.put(res.getInt("userId"), location);
+
+						} catch (SQLException e) {
+							json.clear();
+							e.printStackTrace();
+						}
+
+					});
 				
-			} catch (SQLException e) {
-				json.clear();
-				e.printStackTrace();
-			}
+				}
+//					
+//
+//		}).start(); 
 
-		});
-	}
+//	}
 	
 //=======================================================	
 //	When new user is registered
@@ -70,8 +111,8 @@ public final class LocationManager {
 //=======================================================	
 	public static void updateUsersStatus(String mail, String lat,String lng) {
 		Users currentUser = UsersManager.returnUserId(mail);
-		String query = String.format("UPDATE usersStatus SET loggedIn = true, lastLatitude = %s,"
-				+ "lastLongitude = %s WHERE userId = %d;",lat,lng,currentUser.getId());
+		
+		String query = String.format("UPDATE usersStatus SET loggedIn = true, lastLatitude = %s,lastLongitude = %s WHERE userId = %d;",lat,lng,currentUser.getId());
 		DBManager.runExecute(query);
 	}
 	

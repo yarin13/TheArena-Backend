@@ -163,8 +163,7 @@ public final class UsersManager {
 		 * second it send a query to the GetUserInfo function.
 		 */
 		String query = String.format(
-				"select * from users where email = '%s';",
-				emailTxt);
+				"select * from users where email = '%s';",emailTxt);
 		if (DBManager.isExists(query) > 0) {
 			return DBManager.getUserInfoWithId(query);
 		} else {

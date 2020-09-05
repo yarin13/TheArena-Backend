@@ -1,6 +1,7 @@
 package arena.dal;
 import arena.bll.Users;
 
+import java.io.InputStream;
 import java.sql.*;
 import java.util.function.Consumer;
 
@@ -139,6 +140,36 @@ public final class DBManager {
 		return -1;
 	}
 	
+	
+	
+	public static boolean runExecuteImage(int userId,InputStream image) {
+		/*
+		 * this function get a query and return the number of row in the result,
+		 * mostly used on insert , update or delete queries
+		 */
+		PreparedStatement statement = null;
+
+		String query = "INSERT INTO usersPhotos(userId,photo) VALUES (?, ?)";
+		
+		try {
+			connection = DBManager.getConnection();			 //initializing connection 
+			PreparedStatement pstmt = connection.prepareStatement(query);
+			pstmt.setInt(1, userId);
+		    pstmt.setBinaryStream(2, image);
+		    return pstmt.execute();
+		      
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (statement != null)
+				try {
+					statement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return false;
+	}
 	
 	//---------------------------------------------------------Users---------------------------------------------------------
 	

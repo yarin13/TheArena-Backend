@@ -1,6 +1,8 @@
 package arena.servlets;
 
 import java.io.IOException;
+import java.util.HashMap;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -45,14 +47,14 @@ public class OnlineUsersLocation extends HttpServlet {
 //=====================================================    
     
 	protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String lat = request.getHeader("lat");
-		String lng = request.getHeader("lng");
-		String mail = request.getHeader("mail");
-		
+		String lat = request.getParameter("lat");
+		String lng = request.getParameter("lng");
+		String mail = request.getParameter("mail");
+
 		LocationManager.updateUsersStatus(mail, lat, lng);
 		
 		jsonResponse.clear();
-		LocationManager.getOnlineUsersLocation(lat,lng);
+		LocationManager.getOnlineUsersLocation(mail,lat,lng);
 		
         if (!LocationManager.location.isEmpty()) {
             jsonResponse.add(LocationManager.json);
