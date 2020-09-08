@@ -14,7 +14,7 @@ import java.io.IOException;
 public class QuestionServlet extends HttpServlet {
     /*
      * -------------------------------------------QuestionServlet-------------------------------------------
-     * GET: http://localhost:8080/TheArenaServler/QuestionServlet
+     * GET: http://localhost:8080/TheArenaServlet/QuestionServlet
      */
     private static final long serialVersionUID = 1L;
     private static JSONArray jsonResponse = new JSONArray();
