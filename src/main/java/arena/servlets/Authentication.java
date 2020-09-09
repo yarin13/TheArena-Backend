@@ -80,17 +80,18 @@ public class Authentication extends HttpServlet {
     	String mail = request.getParameter("email");
     	String newPassword = request.getParameter("newPassword");
     	
-    	if(!UsersManager.updatePassword(mail, newPassword)) {
-
-    	        jsonMap.put("error","could not update password");
-                res = new JSONObject(jsonMap);
-                try {
-					response.getWriter().append(res.toJSONString());
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 
-    	}
+    	if(!UsersManager.updatePassword(mail, newPassword)) 
+    	    jsonMap.put("error","could not update password");
+    	else 
+    		jsonMap.put("Success","Success");
+       
+    	res = new JSONObject(jsonMap);
+        try {
+			response.getWriter().append(res.toJSONString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 
     }
 

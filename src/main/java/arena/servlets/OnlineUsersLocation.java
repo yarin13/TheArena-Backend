@@ -2,6 +2,7 @@ package arena.servlets;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import arena.bll.*;
 import arena.dal.DBManager;
@@ -50,6 +52,8 @@ public class OnlineUsersLocation extends HttpServlet {
 		String lat = request.getParameter("lat");
 		String lng = request.getParameter("lng");
 		String mail = request.getParameter("mail");
+        Map<String,String> jsonMap = new HashMap<>();
+        JSONObject res ;
 
 		LocationManager.updateUsersStatus(mail, lat, lng);
 		
@@ -60,7 +64,9 @@ public class OnlineUsersLocation extends HttpServlet {
             jsonResponse.add(LocationManager.json);
             response.getWriter().append(jsonResponse.toJSONString());
         } else {
-            jsonResponse.add(null);
+        	jsonMap.put("Error","No one else was found");
+        	res = new JSONObject(jsonMap);
+            jsonResponse.add(res);
             response.getWriter().append(jsonResponse.toJSONString());
         }
     

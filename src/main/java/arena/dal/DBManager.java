@@ -1,7 +1,12 @@
 package arena.dal;
 import arena.bll.Users;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.*;
 import java.util.function.Consumer;
 
@@ -142,34 +147,79 @@ public final class DBManager {
 	
 	
 	
-	public static boolean runExecuteImage(int userId,InputStream image) {
+	public static boolean insertImage(int userId,InputStream image) {
 		/*
 		 * this function get a query and return the number of row in the result,
 		 * mostly used on insert , update or delete queries
 		 */
-		PreparedStatement statement = null;
+		PreparedStatement pstmt = null;
 
 		String query = "INSERT INTO usersPhotos(userId,photo) VALUES (?, ?)";
 		
 		try {
 			connection = DBManager.getConnection();			 //initializing connection 
-			PreparedStatement pstmt = connection.prepareStatement(query);
+			pstmt = connection.prepareStatement(query);
 			pstmt.setInt(1, userId);
 		    pstmt.setBinaryStream(2, image);
+		    System.out.println("testing");
 		    return pstmt.execute();
 		      
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			if (statement != null)
+			if (pstmt != null)
 				try {
-					statement.close();
+					pstmt.close();
+				
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 		}
 		return false;
 	}
+	
+	public static FileOutputStream selectImage(String query,OutputStream os) throws FileNotFoundException {
+		ResultSet result = null;
+		Statement pstmt = null;
+		
+		InputStream input = null;
+		FileOutputStream output = null;
+		try {
+			connection = DBManager.getConnection();			 //initializing connection 
+			pstmt = connection.createStatement();
+			result =  pstmt.executeQuery(query);
+			
+			File image = new File("userPhotos");
+			output = new FileOutputStream(image);
+		      
+			if(result.next()) {
+				input = result.getBinaryStream("photo");
+				
+				byte[] buffer = new byte[1024];
+				while(input.read(buffer) > 0) {
+					output.write(buffer);
+					os.write(buffer);
+				}
+				return output;
+				
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if (pstmt != null)
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return null;
+	}
+	
 	
 	//---------------------------------------------------------Users---------------------------------------------------------
 	
