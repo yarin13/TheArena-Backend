@@ -2,12 +2,18 @@ package arena.servlets;
 
 import arena.bll.UsersManager;
 import arena.bll.Users;
+
+import org.json.JSONException;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -152,4 +158,43 @@ public class Authentication extends HttpServlet {
         return false;
 
     }
+    
+    
+//============================================================================	
+//	this function extracts to body of the request 
+//  and returns it as JSONObject	
+//============================================================================		
+	protected JSONObject getBodyParams(HttpServletRequest request) {
+		 StringBuilder sb = new StringBuilder();
+		 String line = null;
+		 JSONObject json = null;
+		 
+		 BufferedReader reader;
+		try {
+			reader = request.getReader();
+			 while ((line = reader.readLine()) != null) 
+				 sb.append(line);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+
+			JSONParser parser = new JSONParser(); 
+			try {
+				json = (JSONObject) parser.parse(sb.toString());
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+				//json = new JSONObject(sb.toString());
+				
+			
+
+	
+		return json;
+		 
+	}
+    
+    
 }

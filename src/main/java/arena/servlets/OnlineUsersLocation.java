@@ -1,5 +1,6 @@
 package arena.servlets;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +11,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONException;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+//import org.json.simple.JSONObject;
+
+import org.json.JSONObject;
 
 import arena.bll.*;
 import arena.dal.DBManager;
@@ -49,11 +53,24 @@ public class OnlineUsersLocation extends HttpServlet {
 //=====================================================    
     
 	protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String lat = request.getParameter("lat");
-		String lng = request.getParameter("lng");
-		String mail = request.getParameter("mail");
+		String lat = null;
+		String lng = null;
+		String mail = null;
+		JSONObject params = getBodyParams(request);
+		
         Map<String,String> jsonMap = new HashMap<>();
         JSONObject res ;
+		
+		try {
+			lat = params.get("lat").toString();
+			lng = params.get("lng").toString();
+			mail = params.get("mail").toString();
+		} catch (JSONException e) {
+        	jsonMap.put("Error","Missing some fields");
+        	res = new JSONObject(jsonMap);
+            jsonResponse.add(res);
+            response.getWriter().append(jsonResponse.toJSONString());
+		}
 
 		LocationManager.updateUsersStatus(mail, lat, lng);
 		
@@ -88,9 +105,55 @@ public class OnlineUsersLocation extends HttpServlet {
 //============================================================================	
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String mail = request.getParameter("email");
+		String mail = null;
+		JSONObject params = getBodyParams(request);
+	    Map<String,String> jsonMap = new HashMap<>();
+	    JSONObject res ;
+		try {
+			mail = params.get("mail").toString();
+		} catch (JSONException e) {
+	      	jsonMap.put("Error","Missing some fields");
+        	res = new JSONObject(jsonMap);
+            jsonResponse.add(res);
+            response.getWriter().append(jsonResponse.toJSONString());
+		}
+		
 		LocationManager.logOutUser(mail);
-		//doGet(request, response);
+	}
+	
+
+	
+	
+	
+//============================================================================	
+//	this function extracts to body of the request 
+//  and returns it as JSONObject	
+//============================================================================		
+	protected JSONObject getBodyParams(HttpServletRequest request) {
+		 StringBuilder sb = new StringBuilder();
+		 String line = null;
+		 JSONObject json = null;
+		 
+		 BufferedReader reader;
+		try {
+			reader = request.getReader();
+			 while ((line = reader.readLine()) != null) 
+				 sb.append(line);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		try {
+				json = new JSONObject(sb.toString());
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+	
+		return json;
+		 
 	}
 
 }
