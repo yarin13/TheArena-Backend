@@ -53,6 +53,7 @@ public class Authentication extends HttpServlet {
         String mail = null;
         String password = null;
 		try {
+			System.out.println("inside try");
 			mail = Authentication.bodyParams.get("email").toString();
 			password = Authentication.bodyParams.get("password").toString();
 		} catch (JSONException e) {
@@ -60,21 +61,28 @@ public class Authentication extends HttpServlet {
 			e.printStackTrace();
 		}
         
-        
+		System.out.println("before if");
         if(checkHeader(request)) {
+        	System.out.println("inside if");
             Users signInUser = UsersManager.checkAuthentication(mail,password);
 
             if (signInUser != null) {
                 jsonMap.put("Success", "success");
-            } else {
-                jsonMap.put("Error", "User is not exists");
-            }
-        }else {
-            jsonMap.put("Error", "Please check your request!");
+            } 
+//            else {
+//                jsonMap.put("Error", "User is not exists");
+//            }
+//        }
+        else {
+            jsonMap.put("Error", "one or more fields are incorrect");
         }
-        res = new org.json.simple.JSONObject(jsonMap);
-       response.getWriter().append(res.toJSONString());
-        
+    }else {
+    	jsonMap.put("Error", "User is not exists");
+    }
+    
+
+    res = new org.json.simple.JSONObject(jsonMap);
+   response.getWriter().append(res.toJSONString());
     }
 
     /**
@@ -279,7 +287,7 @@ public class Authentication extends HttpServlet {
 				e.printStackTrace();
 			}
 
-		System.out.println(json);
+		//System.out.println(json);
 		return json;
 		
 		

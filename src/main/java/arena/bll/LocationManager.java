@@ -35,7 +35,7 @@ public final class LocationManager {
 //			@Override
 //			public void run() {
 
-
+		location.clear();
 					Users currentUser = UsersManager.returnUserId(mail);
 					String interestedIn = currentUser.getIntrestedIn();
 					int minScore = currentUser.getScore() - 11;
@@ -69,7 +69,6 @@ public final class LocationManager {
 
 					DBManager.runSelect(query, (res) -> {
 						try {
-							
 							location.clear();
 							location.add(res.getString("firstName"));
 							location.add(res.getString("lastName"));
@@ -81,6 +80,7 @@ public final class LocationManager {
 							json.put(res.getInt("userId"), location);
 
 						} catch (SQLException e) {
+							System.out.println("empty2");
 							json.clear();
 							e.printStackTrace();
 						}
