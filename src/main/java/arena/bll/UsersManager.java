@@ -2,7 +2,9 @@ package arena.bll;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,16 +32,17 @@ public final class UsersManager {
 		 * if the email if valid and there are no user with this email it will create a User object
 		 * and pass it as an argument to the insertUser function with his password. 
 		 */
-		Object[] values = Authentication.checkParameters(request);
+	//	Object[] values = Authentication.checkParameters(request);
+		Map<String,String> values = Authentication.checkParameters(request);
 		
 		// Email validation
 		if (values == null) throw new AssertionError();
-		String mailTxt = (String) values[0];
+		String mailTxt = (String) values.get("email");
 		if (emailValidation(mailTxt)) {
 			String query = String.format("Select email from users where email = '%s';", mailTxt);
 			if (DBManager.isExists(query) == 0)
-				return insertUser(new Users(mailTxt, (String) values[1], (String) values[2], (String) values[3],
-						Integer.parseInt((String) values[4]), (String) values[5], (String) values[6], Integer.parseInt((String)values[7])), (String) values[8]);
+				return insertUser(new Users(mailTxt, values.get("firstName"),values.get("lastName"),values.get("phoneNumber"),
+						Integer.parseInt(values.get("age")),values.get("gender"),values.get("intrestedIn"), Integer.parseInt(values.get("score"))), values.get("password"));
 			else if(DBManager.isExists(query) ==1 ) {
 				Map<String,String> jsonMap = new HashMap<>();
 				jsonMap.put("Error","User already exists");
