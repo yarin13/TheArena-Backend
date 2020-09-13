@@ -42,7 +42,7 @@ public final class LocationManager {
 					int maxScore = currentUser.getScore() + 11;
 					String query;
 					
-					if(interestedIn.equals("women")) {
+					if(interestedIn.equals("female")) {
 						query = String.format("SELECT userId,firstName,lastName,email,phoneNumber,age,lastLatitude,lastLongitude,"
 								+ " ( 6371000 * acos( cos( radians(%s) ) * cos( radians( lastLatitude ) ) * cos( radians( lastLongitude ) - radians(%s) ) + sin( radians(%s) ) * sin(radians(lastLatitude)) ) )"
 								+ " AS distance From users inner join usersStatus on users.id = usersStatus.userId"

@@ -45,39 +45,39 @@ public class Authentication extends HttpServlet {
      */
     protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        Map<String,String> jsonMap = new HashMap<>();
-        org.json.simple.JSONObject res ;
-        Authentication.bodyParams = null;
-        Authentication.bodyParams = getBodyParams(request);
-        String mail = null;
-        String password = null;
-		try {
-			mail = Authentication.bodyParams.get("email").toString();
-			password = Authentication.bodyParams.get("password").toString();
-			
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			   jsonMap.put("Error", "one or more fields are missing");
-			   res = new org.json.simple.JSONObject(jsonMap);
-			   response.getWriter().append(res.toJSONString());
-			   return;
-		}
-        if(checkHeader()) {
-            Users signInUser = UsersManager.checkAuthentication(mail,password);
-
-            if (signInUser != null) {
-                jsonMap.put("Success", "success");
-            } else {
-            jsonMap.put("Error", "one or more fields are incorrect");
-        }
-    }else {
-    	jsonMap.put("Error", "User is not exists");
-    }
-    
-
-   res = new org.json.simple.JSONObject(jsonMap);
-   response.getWriter().append(res.toJSONString());
+//        Map<String,String> jsonMap = new HashMap<>();
+//        org.json.simple.JSONObject res ;
+//        Authentication.bodyParams = null;
+//        Authentication.bodyParams = getBodyParams(request);
+//        String mail = null;
+//        String password = null;
+//		try {
+//			mail = Authentication.bodyParams.get("email").toString();
+//			password = Authentication.bodyParams.get("password").toString();
+//			
+//		} catch (JSONException e) {
+//			// TODO Auto-generated catch block
+//			//e.printStackTrace();
+//			   jsonMap.put("Error", "one or more fields are missing");
+//			   res = new org.json.simple.JSONObject(jsonMap);
+//			   response.getWriter().append(res.toJSONString());
+//			   return;
+//		}
+//        if(checkHeader()) {
+//            Users signInUser = UsersManager.checkAuthentication(mail,password);
+//
+//            if (signInUser != null) {
+//                jsonMap.put("Success", "success");
+//            } else {
+//            jsonMap.put("Error", "one or more fields are incorrect");
+//        }
+//    }else {
+//    	jsonMap.put("Error", "User is not exists");
+//    }
+//    
+//
+//   res = new org.json.simple.JSONObject(jsonMap);
+//   response.getWriter().append(res.toJSONString());
     }
 
     /**
@@ -87,14 +87,56 @@ public class Authentication extends HttpServlet {
     protected synchronized void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
     	Authentication.bodyParams = null;
+    	Authentication.bodyParams = getBodyParams(request);
         Map<String,String> jsonMap = new HashMap<>();
         org.json.simple.JSONObject res;
-        if (checkParameters(request, response))
-            if (UsersManager.beforeInsertUser(request , response)){
-                jsonMap.put("Success","New user is created!");
-                res = new org.json.simple.JSONObject(jsonMap);
-                response.getWriter().append(res.toJSONString());
+    	
+    	if(Authentication.bodyParams.has("gender")) {
+    		//register new user
+            if (checkParameters(request, response))
+                if (UsersManager.beforeInsertUser(request , response)){
+                    jsonMap.put("Success","New user is created!");
+                    res = new org.json.simple.JSONObject(jsonMap);
+                    response.getWriter().append(res.toJSONString());
+                }
+    	}
+    	else {
+    		//signIn user
+            String mail = null;
+            String password = null;
+    		try {
+    			mail = Authentication.bodyParams.get("email").toString();
+    			password = Authentication.bodyParams.get("password").toString();
+    			
+    		} catch (JSONException e) {
+    			// TODO Auto-generated catch block
+    			//e.printStackTrace();
+    			   jsonMap.put("Error", "one or more fields are missing");
+    			   res = new org.json.simple.JSONObject(jsonMap);
+    			   response.getWriter().append(res.toJSONString());
+    			   return;
+    		}
+            if(checkHeader()) {
+                Users signInUser = UsersManager.checkAuthentication(mail,password);
+
+                if (signInUser != null) {
+                    jsonMap.put("Success", "success");
+                } else {
+                jsonMap.put("Error", "one or more fields are incorrect");
             }
+        }else {
+        	jsonMap.put("Error", "User is not exists");
+        }
+        
+
+       res = new org.json.simple.JSONObject(jsonMap);
+       response.getWriter().append(res.toJSONString());
+    		
+    	}
+    	
+    	
+
+
     }
 
     /**
@@ -120,7 +162,7 @@ public class Authentication extends HttpServlet {
 			e1.printStackTrace();
 		}
 	
-    	if(!UsersManager.updatePassword(mail, newPassword)) 
+    	if(!UsersManager.updatePassword(mail, newPassword) || mail == null || newPassword == null) 
     	    jsonMap.put("error","could not update password");
     	else 
     		jsonMap.put("Success","Success");
@@ -141,7 +183,7 @@ public class Authentication extends HttpServlet {
             throws IOException {
         Map<String,String> jsonMap = new HashMap<>();
         org.json.simple.JSONObject res ;
-        Authentication.bodyParams = getBodyParams(request);
+   
 
         
         

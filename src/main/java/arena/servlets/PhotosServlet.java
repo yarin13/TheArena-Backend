@@ -128,7 +128,7 @@ public class PhotosServlet extends HttpServlet {
     		else {
     			//return error saying no photos for that user
     			jsonMap.put("Error", null);
-    			res = res = new org.json.simple.JSONObject(jsonMap);
+    			res = new org.json.simple.JSONObject(jsonMap);
     			response.getWriter().append(res.toJSONString());
     			return;
     		}
@@ -148,11 +148,27 @@ public class PhotosServlet extends HttpServlet {
     		}
             
         }
-    	
-    	
 
     }
     
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) 
+    		throws IOException{
+        JSONObject params = getBodyParams(request);
+  	    Map<String,String> jsonMap = new HashMap<>();
+  	    org.json.simple.JSONObject res ;
+  	    
+		try {
+			String mail = params.getString("email");
+			int photoId = params.getInt("photoId");
+			if(PhotosManager.deletePhoto(mail,photoId))
+				jsonMap.put("Success","Photo was deleted succesfully");
+			else
+				jsonMap.put("Error","Could not delete photo");
+		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+    }
     
     
     

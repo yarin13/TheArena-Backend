@@ -193,13 +193,14 @@ public final class DBManager {
 	   pstmt = connection.createStatement();
 	   rs =  pstmt.executeQuery(query);
     
-	   while (rs.next()) {
+	   if (rs.next()) {
               image = rs.getBlob("photo");//getting image from database 
               imgData = image.getBytes(1,(int)image.length()); //extra info about image
+              
        	   	  os.write(imgData);//sending the image 
-       	   	  os.flush();
+       	   	  
             } 
-
+	   os.flush();
 	   os.close();
 
    }

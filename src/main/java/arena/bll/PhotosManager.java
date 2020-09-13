@@ -76,6 +76,17 @@ public class PhotosManager {
 		
 	}
 	
+	public static boolean deletePhoto(String mail,int photoId) {
+		Users currentUser = UsersManager.returnUserId(mail);
+		String query = String.format("DELETE FROM usersPhotos WHERE id = %d AND userId = %d;",photoId, currentUser.getId());
+		if(DBManager.runExecute(query) > 0 ) {
+			return true;
+		}
+		else
+			return false;
+		
+	}
+	
 	
 	
 	public static ArrayList<Integer> selectPhotosIds(String mail) {

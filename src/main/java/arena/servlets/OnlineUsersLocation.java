@@ -52,7 +52,7 @@ public class OnlineUsersLocation extends HttpServlet {
 //	  The get also updated the user current location in the DB    
 //=====================================================    
     
-	protected  void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected  void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		JSONArray jsonResponse = new JSONArray();
 //		jsonResponse.clear();
 		String lat = null;
