@@ -43,37 +43,32 @@ public class Authentication extends HttpServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
      *      response)
      */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         Map<String,String> jsonMap = new HashMap<>();
         org.json.simple.JSONObject res ;
         Authentication.bodyParams = null;
         Authentication.bodyParams = getBodyParams(request);
-        //org.json.JSONObject bodyParams = getBodyParams(request);
         String mail = null;
         String password = null;
 		try {
-			System.out.println("inside try");
 			mail = Authentication.bodyParams.get("email").toString();
 			password = Authentication.bodyParams.get("password").toString();
+			
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
+			   jsonMap.put("Error", "one or more fields are missing");
+			   res = new org.json.simple.JSONObject(jsonMap);
+			   response.getWriter().append(res.toJSONString());
+			   return;
 		}
-        
-		System.out.println("before if");
-        if(checkHeader(request)) {
-        	System.out.println("inside if");
+        if(checkHeader()) {
             Users signInUser = UsersManager.checkAuthentication(mail,password);
 
             if (signInUser != null) {
                 jsonMap.put("Success", "success");
-            } 
-//            else {
-//                jsonMap.put("Error", "User is not exists");
-//            }
-//        }
-        else {
+            } else {
             jsonMap.put("Error", "one or more fields are incorrect");
         }
     }else {
@@ -81,7 +76,7 @@ public class Authentication extends HttpServlet {
     }
     
 
-    res = new org.json.simple.JSONObject(jsonMap);
+   res = new org.json.simple.JSONObject(jsonMap);
    response.getWriter().append(res.toJSONString());
     }
 
@@ -89,7 +84,7 @@ public class Authentication extends HttpServlet {
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
      *      response)
      */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected synchronized void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
     	Authentication.bodyParams = null;
         Map<String,String> jsonMap = new HashMap<>();
@@ -124,9 +119,7 @@ public class Authentication extends HttpServlet {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-	     
-
-    	
+	
     	if(!UsersManager.updatePassword(mail, newPassword)) 
     	    jsonMap.put("error","could not update password");
     	else 
@@ -146,12 +139,9 @@ public class Authentication extends HttpServlet {
 
     protected boolean checkParameters(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-    	System.out.println("checkParameters1: ttt");
         Map<String,String> jsonMap = new HashMap<>();
         org.json.simple.JSONObject res ;
-        
-        
-        	Authentication.bodyParams = getBodyParams(request);
+        Authentication.bodyParams = getBodyParams(request);
 
         
         
@@ -173,19 +163,6 @@ public class Authentication extends HttpServlet {
 				e.printStackTrace();
 			}
         }
-//        for (Object paramsObject : paramsObjects) {
-//            try {
-//				if (bodyParams.get((String) paramsObject) != null
-//				        && !bodyParams.get((String) paramsObject).toString().isBlank()) {
-//				    values.add(bodyParams.get((String) paramsObject).toString());
-//				} else {
-//				    values.add(null);
-//				}
-//			} catch (JSONException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//        }
 
         if (values.contains(null) || values.isEmpty()) {
             jsonMap.put("Error", "Missing some fields");
@@ -197,18 +174,12 @@ public class Authentication extends HttpServlet {
     }
 
     public static HashMap<String,String> checkParameters(HttpServletRequest request) {
-    	System.out.println("checkParameters2:  tetsing");
-
-    	
-    	
-    	System.out.println(Authentication.bodyParams.keys());
     	Iterator paramsKeys = Authentication.bodyParams.keys();
     	ArrayList<String> paramsObjects = new ArrayList<String>();
     	  while (paramsKeys.hasNext()) {
     		  paramsObjects.add(paramsKeys.next().toString());
     		  }
-    	
-    	//Object[] paramsObjects = bodyParams.keys();
+
         Object[] values = new Object[paramsObjects.size()];
         HashMap<String,String> val = new HashMap<String,String>();
         
@@ -217,10 +188,9 @@ public class Authentication extends HttpServlet {
 				if (Authentication.bodyParams.get((String) paramsObjects.get(i)) != null
 				        && !Authentication.bodyParams.get((String) paramsObjects.get(i)).toString().isBlank())
 					val.put((String) paramsObjects.get(i), Authentication.bodyParams.get((String) paramsObjects.get(i)).toString());
-				   // values[i] = (request.getParameter((String) paramsObjects.get(i)));
+
 				else
 					val.put("null","null");
-//				    values[i] = null;
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -231,17 +201,10 @@ public class Authentication extends HttpServlet {
         if(val.containsKey("null"))
         	return null;
         return val;
-//        // Check if there is any blanks or null in the fields..
-//        for (Object value : values)
-//            if (value == null)
-//                return null;
-
-        
 
     }
 
-    public static boolean checkHeader(HttpServletRequest request) {
-//    	Authentication.bodyParams = getBodyParams(request);
+    public static boolean checkHeader() {
         String email = null;
         String pass = null;
 		try {
@@ -275,83 +238,17 @@ public class Authentication extends HttpServlet {
 			 while ((line = reader.readLine()) != null) 
 				 sb.append(line);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
 		try {
 				json = new JSONObject(sb.toString());
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				System.out.println("getBodyParams:  cant cast");
 				e.printStackTrace();
 			}
 
-		//System.out.println(json);
 		return json;
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-//		 StringBuilder sb = new StringBuilder();
-//		 String line = null;
-//		 org.json.JSONObject json = null;
-// 
-//		 BufferedReader reader;
-//		try {
-//			reader = request.getReader();
-//			 while ((line = reader.readLine()) != null) {
-//				 sb.append(line);
-//				 
-//			 }
-//				 
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//		
-//
-//
-//			try {
-//				json = new org.json.JSONObject(sb.toString());
-//				//System.out.println(sb.toString());
-//				
-//			} catch (JSONException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//
-////			JSONParser parser = new JSONParser(); 
-////			try {
-////				json = (org.json.JSONObject) parser.parse(sb.toString());
-////			} catch (ParseException e) {
-////				// TODO Auto-generated catch block
-////				e.printStackTrace();
-////			}
-//			
-//
-//		return json;
-		 
+
 	}
     
     

@@ -1,10 +1,14 @@
 package arena.servlets;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -15,6 +19,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import arena.bll.PhotosManager;
 
@@ -65,7 +72,6 @@ public class PhotosServlet extends HttpServlet {
 //		       //String testing = imageInputStream.toString();
 //		       PhotosManager.insertPhoto(mail,imageInputStream);
 
-
 		       List<Part> fileParts = (List<Part>) request.getParts();
 
 		       for (Part filePart2 : parts) {
@@ -82,37 +88,109 @@ public class PhotosServlet extends HttpServlet {
 	
 	
 	
-	
+//============================================================================	
+//this function gets parameter with key called action
+//if the value of that key is: "photosIds" ,the client gets all the photos ids of the requested user(by sending the user's userName
+//if the value of that key is: "image" the client gets the photo he requested by sending the id of that photo 	
+//============================================================================	
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+    	ArrayList<Integer> photosIds;
+        JSONObject params = getBodyParams(request);
+	    Map<String,ArrayList<Integer>> jsonMap = new HashMap<>();
+	    org.json.simple.JSONObject res ;
+    	
+        String action = null;
+        String mail = null;
+		try {
+			action = params.getString("action");
+		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        if("photosIds".equals(action)){
+            //return array of photos ids
 
-        ServletContext sc = getServletContext();
-
-  //      try (InputStream is = sc.getResourceAsStream(PhotosManager.selectPhoto(request.getParameter("mail")))) {
-
-            // it is the responsibility of the container to close output stream
+    		try {
+    			mail = params.getString("userMail").toString();
+    		} catch (JSONException e) {
+    			e.printStackTrace();
+    		}
+    		photosIds = PhotosManager.selectPhotosIds(mail);
+    		if(photosIds != null) {
+    			//return the array with ids
+    			jsonMap.put(mail, photosIds);
+    			res = res = new org.json.simple.JSONObject(jsonMap);
+    			response.getWriter().append(res.toJSONString());
+    			return;
+    		}
+    		else {
+    			//return error saying no photos for that user
+    			jsonMap.put("Error", null);
+    			res = res = new org.json.simple.JSONObject(jsonMap);
+    			response.getWriter().append(res.toJSONString());
+    			return;
+    		}
+        
+        } else if("image".equals(action)){
+           // return photo matches the given id
+            response.setContentType("image/jpeg");
+            ServletContext sc = getServletContext();
             OutputStream os = response.getOutputStream();
 
-//            if (is == null) {
-//
-//                response.setContentType("text/plain");
-//                os.write("Failed to send image".getBytes());
-//            } else {
+            int id ;
+    		try {
+    			id =params.getInt("photoId");
+    			PhotosManager.selectPhoto(id,os);
+    		} catch (JSONException e) {
+    			e.printStackTrace();
+    		}
+            
+        }
+    	
+    	
 
-                response.setContentType("image/jpeg");
-                PhotosManager.selectPhoto(request.getParameter("mail"),os);
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-
-           //     while ((bytesRead = is.read(buffer)) != -1) {
-
-           //         os.write(buffer, 0, bytesRead);
-           //     }
-         //   }
- //       }
     }
+    
+    
+    
+    
+    
+	 
+  //============================================================================	
+//	this function extracts to body of the request 
+//  and returns it as JSONObject	
+//============================================================================		
+	protected JSONObject getBodyParams(HttpServletRequest request) {
+		 StringBuilder sb = new StringBuilder();
+		 String line = null;
+		 JSONObject json = null;
+		 
+		 BufferedReader reader;
+		try {
+			reader = request.getReader();
+			 while ((line = reader.readLine()) != null) 
+				 sb.append(line);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		try {
+				json = new JSONObject(sb.toString());
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+	
+		return json;
+		 
+	}
+
 }
+
 	
 	
 	

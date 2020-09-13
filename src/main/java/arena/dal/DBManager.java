@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public final class DBManager {
@@ -177,48 +179,79 @@ public final class DBManager {
 		}
 		return false;
 	}
-	
+
 	public static FileOutputStream selectImage(String query,OutputStream os) throws FileNotFoundException {
-		ResultSet result = null;
 		Statement pstmt = null;
-		
-		InputStream input = null;
-		FileOutputStream output = null;
-		try {
-			connection = DBManager.getConnection();			 //initializing connection 
-			pstmt = connection.createStatement();
-			result =  pstmt.executeQuery(query);
-			
-			File image = new File("userPhotos");
-			output = new FileOutputStream(image);
-		      
-			if(result.next()) {
-				input = result.getBinaryStream("photo");
-				
-				byte[] buffer = new byte[1024];
-				while(input.read(buffer) > 0) {
-					output.write(buffer);
-					os.write(buffer);
-				}
-				return output;
-				
-			}
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			if (pstmt != null)
-				try {
-					pstmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-		}
-		return null;
-	}
+	Blob image = null;
+    byte[] imgData = null;
+ 
+   int i;
+   ResultSet rs =null;
+
+   try {
+	   connection = DBManager.getConnection();			 //initializing connection 
+	   pstmt = connection.createStatement();
+	   rs =  pstmt.executeQuery(query);
+    
+	   while (rs.next()) {
+              image = rs.getBlob("photo");//getting image from database 
+              imgData = image.getBytes(1,(int)image.length()); //extra info about image
+       	   	  os.write(imgData);//sending the image 
+       	   	  os.flush();
+            } 
+
+	   os.close();
+
+   }
+   catch(Exception e)
+     {
+         e.printStackTrace();
+
+     }
+return null;
+}
+	
+//	public static FileOutputStream selectImage(String query,OutputStream os) throws FileNotFoundException {
+//		ResultSet result = null;
+//		Statement pstmt = null;
+//		
+//		InputStream input = null;
+//		FileOutputStream output = null;
+//		try {
+//			connection = DBManager.getConnection();			 //initializing connection 
+//			pstmt = connection.createStatement();
+//			result =  pstmt.executeQuery(query);
+//			
+//			File image = new File("userPhotos");
+//			output = new FileOutputStream(image);
+//		      
+//			if(result.next()) {
+//				input = result.getBinaryStream("photo");
+//				
+//				byte[] buffer = new byte[1024];
+//				while(input.read(buffer) > 0) {
+//					output.write(buffer);
+//					os.write(buffer);
+//				}
+//				return output;
+//				
+//			}
+//			
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} finally {
+//			if (pstmt != null)
+//				try {
+//					pstmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//		}
+//		return null;
+//	}
 	
 	
 	//---------------------------------------------------------Users---------------------------------------------------------

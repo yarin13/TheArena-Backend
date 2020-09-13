@@ -32,7 +32,7 @@ public class OnlineUsersLocation extends HttpServlet {
 	
 	
 	private static final long serialVersionUID = 1L;
-	private static JSONArray jsonResponse = new JSONArray();
+//	private static JSONArray jsonResponse = new JSONArray();
  
     /**
      * @see HttpServlet#HttpServlet()
@@ -52,7 +52,9 @@ public class OnlineUsersLocation extends HttpServlet {
 //	  The get also updated the user current location in the DB    
 //=====================================================    
     
-	protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected  void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		JSONArray jsonResponse = new JSONArray();
+//		jsonResponse.clear();
 		String lat = null;
 		String lng = null;
 		String mail = null;
@@ -104,13 +106,16 @@ public class OnlineUsersLocation extends HttpServlet {
 //  Headers to pass:"email"(the userName from the android) 	
 //============================================================================	
 	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected  void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		JSONArray jsonResponse = new JSONArray();
+//		jsonResponse.clear();
 		String mail = null;
 		JSONObject params = getBodyParams(request);
 	    Map<String,String> jsonMap = new HashMap<>();
 	    JSONObject res ;
 		try {
 			mail = params.get("mail").toString();
+			LocationManager.logOutUser(mail);
 		} catch (JSONException e) {
 	      	jsonMap.put("Error","Missing some fields");
         	res = new JSONObject(jsonMap);
@@ -118,7 +123,7 @@ public class OnlineUsersLocation extends HttpServlet {
             response.getWriter().append(jsonResponse.toJSONString());
 		}
 		
-		LocationManager.logOutUser(mail);
+		
 	}
 	
 
