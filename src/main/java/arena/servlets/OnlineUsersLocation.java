@@ -45,6 +45,11 @@ public class OnlineUsersLocation extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+//    {
+//        "lat":31.895668,
+//        "lng":35.016050,
+//        "mail":"inbaryarin@gmail.com"
+//    }
 //=====================================================    
 //    added synchronized because of the jsonResponse
 //	  probably can be removed if we create the jsonResponse locally

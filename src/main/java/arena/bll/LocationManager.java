@@ -69,15 +69,17 @@ public final class LocationManager {
 
 					DBManager.runSelect(query, (res) -> {
 						try {
-							location.clear();
-							location.add(res.getString("firstName"));
-							location.add(res.getString("lastName"));
-							location.add(res.getString("email"));
-							location.add(res.getString("phoneNumber"));
-							location.add(res.getString("age"));
-							location.add(res.getString("lastLatitude"));
-							location.add(res.getString("lastLongitude"));
-							json.put(res.getInt("userId"), location);
+							LocationManager.location.clear();
+							LocationManager.location.add(res.getString("firstName"));
+							LocationManager.location.add(res.getString("lastName"));
+							LocationManager.location.add(res.getString("email"));
+							LocationManager.location.add(res.getString("phoneNumber"));
+							LocationManager.location.add(res.getString("age"));
+							LocationManager.location.add(res.getString("lastLatitude"));
+							LocationManager.location.add(res.getString("lastLongitude"));
+							json.put(res.getInt("userId"), new ArrayList<String>(LocationManager.location));
+						
+							
 
 						} catch (SQLException e) {
 							System.out.println("empty2");
