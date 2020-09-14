@@ -25,7 +25,7 @@ public final class LocationManager {
 	
 	
 	
-	public static  void getOnlineUsersLocation(String mail,String lat,String lng) {
+	public static  void getOnlineUsersLocation(String mail,double lat,double lng) {
 //		this function get latitude and longitude from the user and sends back answer with all the people within
 //		500 meters(including the user itself)
 //		returns null if no one in his area is found
@@ -50,7 +50,7 @@ public final class LocationManager {
 								+ "gender = 'female' "
 								+ "AND score BETWEEN %d AND %d "
 								+ "AND userId != %d "
-								+ "HAVING distance < 500;",lat,lng,lat,minScore,maxScore,currentUser.getId());
+								+ "HAVING distance < 500;",String.valueOf(lat),String.valueOf(lng),String.valueOf(lat),minScore,maxScore,currentUser.getId());
 						
 					}
 					else {
@@ -61,7 +61,7 @@ public final class LocationManager {
 								+ "gender = 'male' "
 								+ "AND score BETWEEN %d AND %d "
 								+ "AND userId != %d "
-								+ "HAVING distance < 500;",lat,lng,lat,minScore,maxScore,currentUser.getId());
+								+ "HAVING distance < 500;",String.valueOf(lat),String.valueOf(lng),String.valueOf(lat),minScore,maxScore,currentUser.getId());
 						
 					}
 					
@@ -111,10 +111,10 @@ public final class LocationManager {
 //	every time the user requests to see other online users in his area
 //	this function should update his info as well
 //=======================================================	
-	public static void updateUsersStatus(String mail, String lat,String lng) {
+	public static void updateUsersStatus(String mail, double lat,double lng) {
 		Users currentUser = UsersManager.returnUserId(mail);
 		
-		String query = String.format("UPDATE usersStatus SET loggedIn = true, lastLatitude = %s,lastLongitude = %s WHERE userId = %d;",lat,lng,currentUser.getId());
+		String query = String.format("UPDATE usersStatus SET loggedIn = true, lastLatitude = %s,lastLongitude = %s WHERE userId = %d;",String.valueOf(lat),String.valueOf(lng),currentUser.getId());
 		DBManager.runExecute(query);
 	}
 	

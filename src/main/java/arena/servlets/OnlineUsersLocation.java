@@ -60,18 +60,30 @@ public class OnlineUsersLocation extends HttpServlet {
 	protected  void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		JSONArray jsonResponse = new JSONArray();
 //		jsonResponse.clear();
-		String lat = null;
-		String lng = null;
-		String mail = null;
+
 		JSONObject params = getBodyParams(request);
 		
         Map<String,String> jsonMap = new HashMap<>();
         JSONObject res ;
 		
 		try {
-			lat = params.get("lat").toString();
-			lng = params.get("lng").toString();
-			mail = params.get("mail").toString();
+			double lat = (double) params.get("lat");
+			double lng = (double) params.get("lng");
+			String mail = params.get("mail").toString();
+			LocationManager.updateUsersStatus(mail, lat, lng);
+			
+			jsonResponse.clear();
+			LocationManager.getOnlineUsersLocation(mail,lat,lng);
+			
+	        if (!LocationManager.location.isEmpty()) {
+	            jsonResponse.add(LocationManager.json);
+	            response.getWriter().append(jsonResponse.toJSONString());
+	        } else {
+	        	jsonMap.put("Error","No one else was found");
+	        	res = new JSONObject(jsonMap);
+	            jsonResponse.add(res);
+	            response.getWriter().append(jsonResponse.toJSONString());
+	        }
 		} catch (JSONException e) {
         	jsonMap.put("Error","Missing some fields");
         	res = new JSONObject(jsonMap);
@@ -79,20 +91,7 @@ public class OnlineUsersLocation extends HttpServlet {
             response.getWriter().append(jsonResponse.toJSONString());
 		}
 
-		LocationManager.updateUsersStatus(mail, lat, lng);
-		
-		jsonResponse.clear();
-		LocationManager.getOnlineUsersLocation(mail,lat,lng);
-		
-        if (!LocationManager.location.isEmpty()) {
-            jsonResponse.add(LocationManager.json);
-            response.getWriter().append(jsonResponse.toJSONString());
-        } else {
-        	jsonMap.put("Error","No one else was found");
-        	res = new JSONObject(jsonMap);
-            jsonResponse.add(res);
-            response.getWriter().append(jsonResponse.toJSONString());
-        }
+
     
         return;
     }
