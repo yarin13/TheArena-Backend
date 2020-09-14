@@ -2,29 +2,18 @@ package arena.servlets;
 
 import arena.bll.UsersManager;
 import arena.bll.Users;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-//import org.json.simple.JSONObject;
-//import org.json.JSONObject;
-//import org.json.simple.JSONObject;
-
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 @WebServlet("/Authentication")
 public class Authentication extends HttpServlet {
