@@ -48,9 +48,10 @@ public final class LocationManager {
 								+ " AS distance From users inner join usersStatus on users.id = usersStatus.userId"
 								+ " WHERE loggedIn = true AND "
 								+ "gender = 'female' "
+								+ "AND interestedIn = '%s' "
 								+ "AND score BETWEEN %d AND %d "
 								+ "AND userId != %d "
-								+ "HAVING distance < 500;",String.valueOf(lat),String.valueOf(lng),String.valueOf(lat),minScore,maxScore,currentUser.getId());
+								+ "HAVING distance < 500;",String.valueOf(lat),String.valueOf(lng),String.valueOf(lat),currentUser.getGender(),minScore,maxScore,currentUser.getId());
 						
 					}
 					else {
@@ -58,10 +59,11 @@ public final class LocationManager {
 								+ " ( 6371000 * acos( cos( radians(%s) ) * cos( radians( lastLatitude ) ) * cos( radians( lastLongitude ) - radians(%s) ) + sin( radians(%s) ) * sin(radians(lastLatitude)) ) )"
 								+ " AS distance From users inner join usersStatus on users.id = usersStatus.userId"
 								+ " WHERE loggedIn = true AND "
-								+ "gender = 'male' "
+								+ "gender = 'male' AND "
+								+ "interestedIn = '%s' "
 								+ "AND score BETWEEN %d AND %d "
 								+ "AND userId != %d "
-								+ "HAVING distance < 500;",String.valueOf(lat),String.valueOf(lng),String.valueOf(lat),minScore,maxScore,currentUser.getId());
+								+ "HAVING distance < 500;",String.valueOf(lat),String.valueOf(lng),String.valueOf(lat),currentUser.getGender(),minScore,maxScore,currentUser.getId());
 						
 					}
 					

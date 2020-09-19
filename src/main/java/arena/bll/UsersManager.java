@@ -37,7 +37,7 @@ public final class UsersManager {
 		
 		// Email validation
 		if (values == null) throw new AssertionError();
-		String mailTxt = (String) values.get("email");
+		String mailTxt = (String) values.get("email").toLowerCase();
 		if (emailValidation(mailTxt)) {
 			String query = String.format("Select email from users where email = '%s';", mailTxt);
 			if (DBManager.isExists(query) == 0)
@@ -65,8 +65,8 @@ public final class UsersManager {
 		String query = String.format(
 				"INSERT INTO users(email, firstName ,lastName ,phoneNumber ,age ,gender ,interestedIn, score) "
 						+ "VALUES ('%s','%s','%s',%s,'%d','%s','%s','%d');",
-				user.getEmail(), user.getFirstName(), user.getLastName(), user.getPhoneNumber(), user.getAge(),
-				user.getGender(), user.getInterestedIn(), user.getScore());
+				user.getEmail(), user.getFirstName().toLowerCase(), user.getLastName().toLowerCase(), user.getPhoneNumber(), user.getAge(),
+				user.getGender().toLowerCase(), user.getInterestedIn().toLowerCase(), user.getScore());
 
 		String getNewUserId = String.format("select id from users where users.email = '%s';" , user.getEmail());
 		
@@ -113,7 +113,7 @@ public final class UsersManager {
 		 * else false;
 		 */
 		String p = Encryptor.encryptThisString(newPassword);
-		Users updatePasswordToThisUser = returnUserId(emailTxt);
+		Users updatePasswordToThisUser = returnUserId(emailTxt.toLowerCase());
 		if(updatePasswordToThisUser != null) {
 			String query = String.format("UPDATE passwords SET hashedPassword = '%s' WHERE userId = %d;",p,updatePasswordToThisUser.getId());
 			return DBManager.runExecute(query) > 0;
@@ -135,10 +135,10 @@ public final class UsersManager {
 		 */
 		String p = Encryptor.encryptThisString(password);
 		String query = String.format("select email from users join passwords on"
-				+ " passwords.userId = users.id where email = '%s' and hashedPassword = '%s';", emailTxt, p);
+				+ " passwords.userId = users.id where email = '%s' and hashedPassword = '%s';", emailTxt.toLowerCase(), p);
 
 		if (DBManager.isExists(query) == 1) {
-			return returnUser(emailTxt);
+			return returnUser(emailTxt.toLowerCase());
 		} else {
 			return null;
 		}
@@ -152,7 +152,7 @@ public final class UsersManager {
 		 */
 		String query = String.format(
 				"select email ,firstName ,lastName , phoneNumber, age, gender, interestedIn , score from users where email = '%s';",
-				emailTxt);
+				emailTxt.toLowerCase());
 		if (DBManager.isExists(query) > 0) {
 			return DBManager.getUserInfo(query);
 		} else {
@@ -166,7 +166,7 @@ public final class UsersManager {
 		 * second it send a query to the GetUserInfo function.
 		 */
 		String query = String.format(
-				"select * from users where email = '%s';",emailTxt);
+				"select * from users where email = '%s';",emailTxt.toLowerCase());
 		if (DBManager.isExists(query) > 0) {
 			return DBManager.getUserInfoWithId(query);
 		} else {

@@ -61,7 +61,7 @@ public class OnlineUsersLocation extends HttpServlet {
 		try {
 			double lat = (double) params.get("lat");
 			double lng = (double) params.get("lng");
-			String mail = params.get("mail").toString();
+			String mail = params.get("mail").toString().toLowerCase();
 			LocationManager.updateUsersStatus(mail, lat, lng);
 			
 			jsonResponse.clear();
