@@ -37,7 +37,7 @@ public final class LocationManager {
 
 		location.clear();
 					Users currentUser = UsersManager.returnUserId(mail);
-					String interestedIn = currentUser.getIntrestedIn();
+					String interestedIn = currentUser.getInterestedIn();
 					int minScore = currentUser.getScore() - 11;
 					int maxScore = currentUser.getScore() + 11;
 					String query;

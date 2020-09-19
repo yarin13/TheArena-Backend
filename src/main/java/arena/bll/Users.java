@@ -10,7 +10,7 @@ public class Users {
 	private String phoneNumber;
 	private int age;
 	private String gender;
-	private String intrestedIn;
+	private String interestedIn;
 	private int score;
 	
 	//------------------------------Getters & Setters----------------------------------
@@ -56,11 +56,11 @@ public class Users {
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
-	public String getIntrestedIn() {
-		return intrestedIn;
+	public String getInterestedIn() {
+		return interestedIn;
 	}
-	public void setIntrestedIn(String intrestedIn) {
-		this.intrestedIn = intrestedIn;
+	public void setInterestedIn(String intrestedIn) {
+		this.interestedIn = intrestedIn;
 	}
 	public int getScore() {
 		return score;
@@ -78,7 +78,7 @@ public class Users {
 		setPhoneNumber(phoneNumber);
 		setAge(age);
 		setGender(gender);
-		setIntrestedIn(intrestedIn);
+		setInterestedIn(intrestedIn);
 		setScore(score);
 	}
 	public Users(String email,String firstName) {
@@ -94,7 +94,7 @@ public class Users {
 		setPhoneNumber(phoneNumber);
 		setAge(age);
 		setGender(gender);
-		setIntrestedIn(intrestedIn);
+		setInterestedIn(intrestedIn);
 		setScore(score);
 	}
 	

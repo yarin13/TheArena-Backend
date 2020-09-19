@@ -42,7 +42,7 @@ public final class UsersManager {
 			String query = String.format("Select email from users where email = '%s';", mailTxt);
 			if (DBManager.isExists(query) == 0)
 				return insertUser(new Users(mailTxt, values.get("firstName"),values.get("lastName"),values.get("phoneNumber"),
-						Integer.parseInt(values.get("age")),values.get("gender"),values.get("intrestedIn"), Integer.parseInt(values.get("score"))), values.get("password"));
+						Integer.parseInt(values.get("age")),values.get("gender"),values.get("interestedIn"), Integer.parseInt(values.get("score"))), values.get("password"));
 			else if(DBManager.isExists(query) ==1 ) {
 				Map<String,String> jsonMap = new HashMap<>();
 				jsonMap.put("Error","User already exists");
@@ -66,7 +66,7 @@ public final class UsersManager {
 				"INSERT INTO users(email, firstName ,lastName ,phoneNumber ,age ,gender ,interestedIn, score) "
 						+ "VALUES ('%s','%s','%s',%s,'%d','%s','%s','%d');",
 				user.getEmail(), user.getFirstName(), user.getLastName(), user.getPhoneNumber(), user.getAge(),
-				user.getGender(), user.getIntrestedIn(), user.getScore());
+				user.getGender(), user.getInterestedIn(), user.getScore());
 
 		String getNewUserId = String.format("select id from users where users.email = '%s';" , user.getEmail());
 		
@@ -151,7 +151,7 @@ public final class UsersManager {
 		 * second it send a query to the GetUserInfo function.
 		 */
 		String query = String.format(
-				"select email ,firstName ,lastName , phoneNumber, age, gender, interestedin , score from users where email = '%s';",
+				"select email ,firstName ,lastName , phoneNumber, age, gender, interestedIn , score from users where email = '%s';",
 				emailTxt);
 		if (DBManager.isExists(query) > 0) {
 			return DBManager.getUserInfo(query);

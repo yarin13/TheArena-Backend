@@ -29,7 +29,7 @@ import arena.bll.PhotosManager;
  * Servlet implementation class Test
  */
 @WebServlet("/PhotosServlet")
-//@javax.servlet.annotation.MultipartConfig
+
 @MultipartConfig
 public class PhotosServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -41,53 +41,24 @@ public class PhotosServlet extends HttpServlet {
         super();
         // TODO Auto-generated constructor stub
     }
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-//	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//		// TODO Auto-generated method stub
-////		request.getParts()
-//		
-//		PhotosManager.selectPhoto(request.getParameter("mail"),response);
-//		response.setContentType(((ServletRequest) PhotosManager.photos).getContentType());
-//		response.getWriter().append(PhotosManager.json.toJSONString());
-//		
-//		
-//		ServletContext sc = getServletContext();
-//
-//	}
-
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		   	Collection<Part> parts = request.getParts();
-
 		   	String mail = request.getParameter("mail");
-		   	
-		   	
-//		       Part filePart = request.getPart("photo");
-//		       InputStream imageInputStream = filePart.getInputStream();
-//		       //String testing = imageInputStream.toString();
-//		       PhotosManager.insertPhoto(mail,imageInputStream);
-
-		       List<Part> fileParts = (List<Part>) request.getParts();
-
-		       for (Part filePart2 : parts) {
-		           InputStream fileContent = filePart2.getInputStream();
-		           if(!filePart2.getName().equals("mail"))
-		        	   PhotosManager.insertPhoto(mail,fileContent);
-		           
-		           
-		       }
-		       
-
+		   	List<Part> fileParts = (List<Part>) request.getParts();
+		   	for (Part part : parts) {
+		    	InputStream fileContent = part.getInputStream();
+		    	if(!part.getName().equals("mail"))
+		        	PhotosManager.insertPhoto(mail,fileContent);
+		   	}
 	}
-	
-	
-	
-	
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+
 //============================================================================	
 //this function gets parameter with key called action
 //if the value of that key is: "photosIds" ,the client gets all the photos ids of the requested user(by sending the user's userName
@@ -138,10 +109,8 @@ public class PhotosServlet extends HttpServlet {
             response.setContentType("image/jpeg");
             ServletContext sc = getServletContext();
             OutputStream os = response.getOutputStream();
-
-            int id ;
     		try {
-    			id =params.getInt("photoId");
+    			int id =params.getInt("photoId");
     			PhotosManager.selectPhoto(id,os);
     		} catch (JSONException e) {
     			e.printStackTrace();
@@ -206,27 +175,3 @@ public class PhotosServlet extends HttpServlet {
 	}
 
 }
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-

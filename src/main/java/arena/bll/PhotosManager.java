@@ -28,52 +28,18 @@ public class PhotosManager {
 		Users currentUser = UsersManager.returnUserId(mail);
 		DBManager.insertImage(currentUser.getId(), image);
 	}
-	
-//	public static void selectPhoto(String mail) {
-//		json.clear();
-//		photos.clear();
-//		
-//		Users currentUser = UsersManager.returnUserId(mail);
-//		String query = String.format("SELECT photo FROM usersPhotos where userId = %d;", currentUser.getId());
-//		
-//		
-//		DBManager.runSelect(query, (res) -> {
-//			try {
-//
-//				photos.add(res.getString("photo"));
-//				json.put("userPhoto", photos);
-//				
-//			} catch (SQLException e) {
-//				photos.clear();
-//				json.clear();
-//				//questions.clear();
-//				e.printStackTrace();
-//			}
-//		});
-//	}
-	
-	
-	
 
-	
-	
-	
 	public static void selectPhoto(int id,OutputStream os) {
 		json.clear();
-		//Users currentUser = UsersManager.returnUserId(mail);
 		String query = String.format("SELECT photo FROM usersPhotos WHERE id = %d;", id);
 		try {
 			FileOutputStream image = DBManager.selectImage(query,os);
-			photos.add(image);
-			json.put("images",photos);
-			//return image.toString();
+//			photos.add(image);
+//			json.put("images",photos);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
-		
-	//	return null;
-		
+		} 	
 	}
 	
 	public static boolean deletePhoto(String mail,int photoId) {

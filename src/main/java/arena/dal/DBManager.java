@@ -1,6 +1,7 @@
 package arena.dal;
 import arena.bll.Users;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -9,8 +10,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+
+
 
 public final class DBManager {
 	
@@ -209,6 +213,14 @@ public final class DBManager {
          e.printStackTrace();
 
      }
+	 finally {
+	if (pstmt != null)
+		try {
+			pstmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+}
 return null;
 }
 	
@@ -306,5 +318,54 @@ return null;
 	    }
 		return null;
 	}
+	
+//	//the real one is in line 183
+//	public static FileOutputStream selectImage(String query,OutputStream os) throws FileNotFoundException {
+//		Statement pstmt = null;
+//	Blob image = null;
+//    byte[] imgData = null;
+// 
+//   int i;
+//   ResultSet rs =null;
+//   
+//   List<Byte[]> list = new ArrayList<Byte[]>();
+//   ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+//
+//   
+//
+//   try {
+//	   connection = DBManager.getConnection();			 //initializing connection 
+//	   pstmt = connection.createStatement();
+//	   rs =  pstmt.executeQuery(query);
+//    
+//	   while(rs.next()) {
+//              image = rs.getBlob("photo");//getting image from database 
+//              imgData = image.getBytes(1,(int)image.length()); //extra info about image
+//              outputStream.write(imgData);
+//       	   	   
+//       	   	  
+//            } 
+//	   byte c[] = outputStream.toByteArray();
+//	   os.write(c);//sending the image
+//	   os.flush();
+//	   os.close();
+//
+//   }
+//   catch(Exception e)
+//     {
+//         e.printStackTrace();
+//
+//     }
+//	 finally {
+//	if (pstmt != null)
+//		try {
+//			pstmt.close();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//}
+//return null;
+//}
+	
 
 }

@@ -34,45 +34,18 @@ public class Authentication extends HttpServlet {
      */
     protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-//        Map<String,String> jsonMap = new HashMap<>();
-//        org.json.simple.JSONObject res ;
-//        Authentication.bodyParams = null;
-//        Authentication.bodyParams = getBodyParams(request);
-//        String mail = null;
-//        String password = null;
-//		try {
-//			mail = Authentication.bodyParams.get("email").toString();
-//			password = Authentication.bodyParams.get("password").toString();
-//			
-//		} catch (JSONException e) {
-//			// TODO Auto-generated catch block
-//			//e.printStackTrace();
-//			   jsonMap.put("Error", "one or more fields are missing");
-//			   res = new org.json.simple.JSONObject(jsonMap);
-//			   response.getWriter().append(res.toJSONString());
-//			   return;
-//		}
-//        if(checkHeader()) {
-//            Users signInUser = UsersManager.checkAuthentication(mail,password);
-//
-//            if (signInUser != null) {
-//                jsonMap.put("Success", "success");
-//            } else {
-//            jsonMap.put("Error", "one or more fields are incorrect");
-//        }
-//    }else {
-//    	jsonMap.put("Error", "User is not exists");
-//    }
-//    
-//
-//   res = new org.json.simple.JSONObject(jsonMap);
-//   response.getWriter().append(res.toJSONString());
+
     }
 
     /**
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
      *      response)
      */
+//==================================
+//POST requests to Log in or Register password
+//If the request body have only "email" and "password" keys so its a login request
+//else it is a register request 
+//==================================    
     protected synchronized void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
     	Authentication.bodyParams = null;
@@ -134,7 +107,7 @@ public class Authentication extends HttpServlet {
     
 //==================================
     //PUT requests to update password
-   // If it runs into an error it returns error else returns nothing if everything went ok
+   // If it runs into an error it returns error else returns Success if everything went ok
 //==================================    
     protected void doPut(HttpServletRequest request, HttpServletResponse response) {
 		 Map<String,String> jsonMap = new HashMap<>();

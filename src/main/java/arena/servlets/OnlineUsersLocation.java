@@ -27,12 +27,12 @@ public class OnlineUsersLocation extends HttpServlet {
 	
     /*
      * -------------------------------------------onlineUsersLocation-------------------------------------------
-     * GET: http://localhost:8080/TheArenaServlet/onlineUsersLocation
+     * PUT: http://localhost:8080/TheArenaServlet/onlineUsersLocation
      */
 	
 	
 	private static final long serialVersionUID = 1L;
-//	private static JSONArray jsonResponse = new JSONArray();
+
  
     /**
      * @see HttpServlet#HttpServlet()
@@ -42,22 +42,14 @@ public class OnlineUsersLocation extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-//    {
-//        "lat":31.895668,
-//        "lng":35.016050,
-//        "mail":"inbaryarin@gmail.com"
-//    }
 //=====================================================    
 //    added synchronized because of the jsonResponse
 //	  probably can be removed if we create the jsonResponse locally
-//    Headers to pass:"lat","lng","mail"
-//	  The get also updated the user current location in the DB    
+//    body to pass:"lat","lng","mail"
+//	  The PUT also updates the user current location in the DB    
 //=====================================================    
     
-	protected  void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected synchronized void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		JSONArray jsonResponse = new JSONArray();
 //		jsonResponse.clear();
 
