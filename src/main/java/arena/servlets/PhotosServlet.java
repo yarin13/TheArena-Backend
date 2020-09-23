@@ -46,11 +46,11 @@ public class PhotosServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		   	Collection<Part> parts = request.getParts();
-		   	String mail = request.getParameter("mail");
+		   	String mail = request.getParameter("email");
 		   	List<Part> fileParts = (List<Part>) request.getParts();
 		   	for (Part part : parts) {
 		    	InputStream fileContent = part.getInputStream();
-		    	if(!part.getName().equals("mail"))
+		    	if(!part.getName().equals("email"))
 		        	PhotosManager.insertPhoto(mail,fileContent);
 		   	}
 	}
@@ -84,7 +84,7 @@ public class PhotosServlet extends HttpServlet {
             //return array of photos ids
 
     		try {
-    			mail = params.getString("userMail").toString();
+    			mail = params.getString("email").toString();
     		} catch (JSONException e) {
     			e.printStackTrace();
     		}

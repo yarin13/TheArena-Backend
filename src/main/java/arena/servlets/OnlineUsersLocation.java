@@ -61,7 +61,7 @@ public class OnlineUsersLocation extends HttpServlet {
 		try {
 			double lat = (double) params.get("lat");
 			double lng = (double) params.get("lng");
-			String mail = params.get("mail").toString().toLowerCase();
+			String mail = params.get("email").toString().toLowerCase();
 			LocationManager.updateUsersStatus(mail, lat, lng);
 			
 			jsonResponse.clear();
@@ -110,7 +110,7 @@ public class OnlineUsersLocation extends HttpServlet {
 	    Map<String,String> jsonMap = new HashMap<>();
 	    JSONObject res ;
 		try {
-			mail = params.get("mail").toString();
+			mail = params.get("email").toString();
 			LocationManager.logOutUser(mail);
 		} catch (JSONException e) {
 	      	jsonMap.put("Error","Missing some fields");
