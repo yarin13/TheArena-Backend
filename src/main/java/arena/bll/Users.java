@@ -71,14 +71,14 @@ public class Users {
 	//----------------------------Constructors------------------------------------
 	
 	//-------------Without id-------------
-	public Users(String email,String firstName, String lastName, String phoneNumber, int age, String gender,String intrestedIn, int score) {
+	public Users(String email,String firstName, String lastName, String phoneNumber, int age, String gender,String interestedIn, int score) {
 		setEmail(email);
 		setFirstName(firstName);
 		setLastName(lastName);
 		setPhoneNumber(phoneNumber);
 		setAge(age);
 		setGender(gender);
-		setInterestedIn(intrestedIn);
+		setInterestedIn(interestedIn);
 		setScore(score);
 	}
 	public Users(String email,String firstName) {
@@ -86,7 +86,7 @@ public class Users {
 		setFirstName(firstName);
 	}
 	//-------------All properties are included-------------
-	public Users(int id, String email,String firstName, String lastName, String phoneNumber, int age, String gender,String intrestedIn, int score) {
+	public Users(int id, String email,String firstName, String lastName, String phoneNumber, int age, String gender,String interestedIn, int score) {
 		setId(id);
 		setEmail(email);
 		setFirstName(firstName);
@@ -94,7 +94,7 @@ public class Users {
 		setPhoneNumber(phoneNumber);
 		setAge(age);
 		setGender(gender);
-		setInterestedIn(intrestedIn);
+		setInterestedIn(interestedIn);
 		setScore(score);
 	}
 	

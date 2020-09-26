@@ -32,149 +32,121 @@ import arena.bll.PhotosManager;
 
 @MultipartConfig
 public class PhotosServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public PhotosServlet() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public PhotosServlet() {
+        super();
+    }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
+    /**
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+     * response)
+     */
 
-//============================================================================	
-// This function gets a parameter called "email" and photo or photos to upload to the DB.
-//============================================================================	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		Collection<Part> parts = request.getParts();
-		String mail = request.getParameter("email");
-		List<Part> fileParts = (List<Part>) request.getParts();
-		for (Part part : parts) {
-			InputStream fileContent = part.getInputStream();
-			if (!part.getName().equals("email"))
-				PhotosManager.insertPhoto(mail, fileContent);
-		}
-	}
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        //============================================================================
+        // This function gets a parameter called "email" and photo or photos to upload to the DB.
+        //============================================================================
+        Collection<Part> parts = request.getParts();
+        String mail = request.getParameter("email");
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
+        for (Part part : parts) {
+            InputStream fileContent = part.getInputStream();
+            if (!part.getName().equals("email"))
+                PhotosManager.insertPhoto(mail, fileContent);
+        }
+    }
 
-//============================================================================	
-//this function gets parameter with key called action
-//if the value of that key is: "photosIds" ,the client gets all the photos ids of the requested user(by sending the user's userName
-//if the value of that key is: "image" the client gets the photo he requested by sending the id of that photo 	
-//============================================================================	
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		ArrayList<Integer> photosIds;
-		JSONObject params = getBodyParams(request);
-		Map<String, ArrayList<Integer>> jsonMap = new HashMap<>();
-		org.json.simple.JSONObject res;
+    /**
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+     * response)
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //============================================================================
+        //this function gets parameter with key called action
+        //if the value of that key is: "photosIds" ,the client gets all the photos ids of the requested user(by sending the user's userName
+        //if the value of that key is: "image" the client gets the photo he requested by sending the id of that photo
+        //============================================================================
+        ArrayList<Integer> photosIds;
+        JSONObject params = getBodyParams(request);
+        Map<String, ArrayList<Integer>> jsonMap = new HashMap<>();
+        org.json.simple.JSONObject res;
 
-		String action = null;
-		String mail = null;
-		try {
-			action = params.getString("action");
-		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		if ("photosIds".equals(action)) {
-			// return array of photos ids
+        String action = params.getString("action");
+        String mail = params.getString("email");
 
-			try {
-				mail = params.getString("email").toString();
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			photosIds = PhotosManager.selectPhotosIds(mail);
-			if (photosIds != null) {
-				// return the array with ids
-				jsonMap.put(mail, photosIds);
-				res = res = new org.json.simple.JSONObject(jsonMap);
-				response.getWriter().append(res.toJSONString());
-				return;
-			} else {
-				// return error saying no photos for that user
-				jsonMap.put("Error", null);
-				res = new org.json.simple.JSONObject(jsonMap);
-				response.getWriter().append(res.toJSONString());
-				return;
-			}
+        if (action.equals("photosIds")) {
+            // return array of photos ids
+            photosIds = PhotosManager.selectPhotosIds(mail);
+            if (photosIds != null) {
+                // return the array with ids
+                jsonMap.put(mail, photosIds);
+                res = new org.json.simple.JSONObject(jsonMap);
+                response.getWriter().append(res.toJSONString());
+            } else {
+                // return error saying no photos for that user
+                jsonMap.put("Error", null);
+                res = new org.json.simple.JSONObject(jsonMap);
+                response.getWriter().append(res.toJSONString());
+            }
 
-		} else if ("image".equals(action)) {
-			// return photo matches the given id
-			response.setContentType("image/jpeg");
-			OutputStream os = response.getOutputStream();
-			try {
-				int id = params.getInt("photoId");
-				PhotosManager.selectPhoto(id, os);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+        } else if ("image".equals(action)) {
+            // return photo matches the given id
+            response.setContentType("image/jpeg");
+            OutputStream os = response.getOutputStream();
+            try {
+                int id = params.getInt("photoId");
+                PhotosManager.selectPhoto(id, os);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-		}
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
+        //============================================================================
+        // This function gets the params : "email" and "photoId" and deletes the photo from the DB.
+        //============================================================================
+        JSONObject params = getBodyParams(request);
+        Map<String, String> jsonMap = new HashMap<>();
 
-	}
-//============================================================================	
-//This function gets the params : "email" and "photoId" and deletes the photo from
-//the DB.
-//============================================================================	
+        try {
+            String mail = params.getString("email");
+            int photoId = params.getInt("photoId");
+            if (PhotosManager.deletePhoto(mail, photoId))
+                jsonMap.put("Success", "Photo was deleted successfully");
+            else
+                jsonMap.put("Error", "Could not delete photo");
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+        }
+    }
 
-	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		JSONObject params = getBodyParams(request);
-		Map<String, String> jsonMap = new HashMap<>();
-		org.json.simple.JSONObject res;
+    protected JSONObject getBodyParams(HttpServletRequest request) {
+        // ============================================================================
+        //	this function extracts to body of the request
+        //  and returns it as JSONObject
+        //============================================================================
+        StringBuilder sb = new StringBuilder();
+        String line;
+        JSONObject json = null;
 
-		try {
-			String mail = params.getString("email");
-			int photoId = params.getInt("photoId");
-			if (PhotosManager.deletePhoto(mail, photoId))
-				jsonMap.put("Success", "Photo was deleted succesfully");
-			else
-				jsonMap.put("Error", "Could not delete photo");
-		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-	}
+        BufferedReader reader;
+        try {
+            reader = request.getReader();
+            while ((line = reader.readLine()) != null)
+                sb.append(line);
+            json = new JSONObject(sb.toString());
+        } catch (Exception e1) {
 
-// ============================================================================
-//	this function extracts to body of the request 
-//  and returns it as JSONObject	
-//============================================================================		
-	protected JSONObject getBodyParams(HttpServletRequest request) {
-		StringBuilder sb = new StringBuilder();
-		String line = null;
-		JSONObject json = null;
-
-		BufferedReader reader;
-		try {
-			reader = request.getReader();
-			while ((line = reader.readLine()) != null)
-				sb.append(line);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		try {
-			json = new JSONObject(sb.toString());
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return json;
-
-	}
+            e1.printStackTrace();
+        }
+        return json;
+    }
 
 }

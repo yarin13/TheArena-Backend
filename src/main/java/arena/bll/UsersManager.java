@@ -24,7 +24,7 @@ public final class UsersManager {
 
 	//----------------------------------------Boolean----------------------------------------
 
-	public static boolean beforeInsertUser(HttpServletRequest request , HttpServletResponse response) throws IOException {
+	public static boolean beforeInsertUser(org.json.JSONObject bodyParams , HttpServletResponse response) throws IOException {
 		/*
 		 * This function get the request and the response,
 		 * first it's validating that all field are not null or blank. 
@@ -32,22 +32,25 @@ public final class UsersManager {
 		 * if the email if valid and there are no user with this email it will create a User object
 		 * and pass it as an argument to the insertUser function with his password. 
 		 */
-	//	Object[] values = Authentication.checkParameters(request);
-		Map<String,String> values = Authentication.checkParameters(request);
+		Map<String,String> jsonMapResponse = new HashMap<>();
+		Map<String,String> values = Authentication.checkParameters(bodyParams);
 		
 		// Email validation
-		if (values == null) throw new AssertionError();
-		String mailTxt = (String) values.get("email").toLowerCase();
+		assert values != null;
+		if (values.containsValue(null) || values.containsValue("null")){
+			jsonMapResponse.put("Error","Something is missing");
+			response.getWriter().append(new JSONObject(jsonMapResponse).toJSONString());
+			return false;
+		};
+		String mailTxt = values.get("email").toLowerCase();
 		if (emailValidation(mailTxt)) {
 			String query = String.format("Select email from users where email = '%s';", mailTxt);
 			if (DBManager.isExists(query) == 0)
 				return insertUser(new Users(mailTxt, values.get("firstName"),values.get("lastName"),values.get("phoneNumber"),
 						Integer.parseInt(values.get("age")),values.get("gender"),values.get("interestedIn"), Integer.parseInt(values.get("score"))), values.get("password"));
 			else if(DBManager.isExists(query) ==1 ) {
-				Map<String,String> jsonMap = new HashMap<>();
-				jsonMap.put("Error","User already exists");
-				JSONObject jsonError = new JSONObject(jsonMap);
-				response.getWriter().append(jsonError.toJSONString());
+				jsonMapResponse.put("Error","User already exists");
+				response.getWriter().append(new JSONObject(jsonMapResponse).toJSONString());
 			}
 		}
 		return false;

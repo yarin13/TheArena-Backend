@@ -18,56 +18,50 @@ import java.util.Map;
 @WebServlet("/Authentication")
 public class Authentication extends HttpServlet {
 	/*
-	 * -----------------------------------------------Authentication----------------
-	 * ------------------------------- To check if a single user is exists |GET:
-	 * http://localhost:8080/TheArenaServlet/Authentication |Done To register a new
-	 * user |POST:http://localhost:8080/TheArenaServlet/Authentication |Done To
-	 * reset a user password |PUT:
-	 * http://localhost:8080/TheArenaServlet/Authentication |Done
+	 * -----------------------------------------------Authentication-----------------------------------------------
+	 * To check if a single user is exists |GET: http://localhost:8080/TheArenaServlet/Authentication |Done
+	 * To register a new user |POST:http://localhost:8080/TheArenaServlet/Authentication |Done
+	 * To reset a user password |PUT: http://localhost:8080/TheArenaServlet/Authentication |Done
 	 */
 	private static final long serialVersionUID = 1L;
-
-	public static JSONObject bodyParams = null;
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
-//==================================
-//POST requests to Log in or Register password
-//If the request body have only "email" and "password" keys so its a login request
-//else it is a register request 
-//==================================    
 	protected synchronized void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Authentication.bodyParams = null;
-		Authentication.bodyParams = getBodyParams(request);
+		//==================================
+        //POST requests to Log in or Register password
+        //If the request body have only "email" and "password" keys so its a login request
+        //else it is a register request
+        //==================================
+
+		org.json.JSONObject bodyParams = getBodyParams(request);
 		Map<String, String> jsonMap = new HashMap<>();
 		org.json.simple.JSONObject res;
 
-		if (Authentication.bodyParams.has("gender")) {
+		if (bodyParams.length() != 2) {
 			// register new user
-			if (checkParameters(request, response))
-				if (UsersManager.beforeInsertUser(request, response)) {
+			if (checkParameters(bodyParams, response))
+				if (UsersManager.beforeInsertUser(bodyParams, response)) {
 					jsonMap.put("Success", "New user is created!");
 					res = new org.json.simple.JSONObject(jsonMap);
 					response.getWriter().append(res.toJSONString());
 				}
 		} else {
 			// signIn user
-			String mail = null;
-			String password = null;
+			String mail;
+			String password;
 			try {
-				mail = Authentication.bodyParams.get("email").toString();
-				password = Authentication.bodyParams.get("password").toString();
+				mail = bodyParams.get("email").toString();
+				password = bodyParams.get("password").toString();
+				Users signInUser = UsersManager.checkAuthentication(mail, password);
 
+				if (signInUser != null) {
+					jsonMap.put("Success", "success");
+				} else {
+					jsonMap.put("Error", "one or more fields are incorrect");
+				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				// e.printStackTrace();
@@ -76,18 +70,6 @@ public class Authentication extends HttpServlet {
 				response.getWriter().append(res.toJSONString());
 				return;
 			}
-			if (checkHeader()) {
-				Users signInUser = UsersManager.checkAuthentication(mail, password);
-
-				if (signInUser != null) {
-					jsonMap.put("Success", "success");
-				} else {
-					jsonMap.put("Error", "one or more fields are incorrect");
-				}
-			} else {
-				jsonMap.put("Error", "User is not exists");
-			}
-
 			res = new org.json.simple.JSONObject(jsonMap);
 			response.getWriter().append(res.toJSONString());
 
@@ -98,13 +80,11 @@ public class Authentication extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPut(HttpServletRequest, HttpServletResponse)
 	 */
-
-//==================================
-	// PUT requests to update password
-	// If it runs into an error it returns error else returns Success if everything
-	// went ok
-//==================================    
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) {
+		//==================================
+		// PUT requests to update password
+		// If it runs into an error it returns error else returns Success if everything went ok
+        //==================================
 		Map<String, String> jsonMap = new HashMap<>();
 		org.json.simple.JSONObject res;
 
@@ -119,7 +99,8 @@ public class Authentication extends HttpServlet {
 			e1.printStackTrace();
 		}
 
-		if (!UsersManager.updatePassword(mail, newPassword) || mail == null || newPassword == null)
+		assert mail != null;
+		if (newPassword == null || !UsersManager.updatePassword(mail, newPassword))
 			jsonMap.put("error", "could not update password");
 		else
 			jsonMap.put("Success", "Success");
@@ -128,7 +109,6 @@ public class Authentication extends HttpServlet {
 		try {
 			response.getWriter().append(res.toJSONString());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -136,7 +116,8 @@ public class Authentication extends HttpServlet {
 
 	// ----------------------------------------Other----------------------------------------
 
-	protected boolean checkParameters(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	protected boolean checkParameters(org.json.JSONObject bodyParams, HttpServletResponse response) throws IOException {
+
 		Map<String, String> jsonMap = new HashMap<>();
 		org.json.simple.JSONObject res;
 
@@ -153,7 +134,6 @@ public class Authentication extends HttpServlet {
 					values.add(null);
 				}
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -167,30 +147,24 @@ public class Authentication extends HttpServlet {
 		return true;
 	}
 
-	public static HashMap<String, String> checkParameters(HttpServletRequest request) {
-		Iterator paramsKeys = Authentication.bodyParams.keys();
-		ArrayList<String> paramsObjects = new ArrayList<String>();
+	public static HashMap<String, String> checkParameters(org.json.JSONObject bodyParams) {
+		Iterator paramsKeys = bodyParams.keys();
+		ArrayList<String> paramsObjects = new ArrayList<>();
 		while (paramsKeys.hasNext()) {
 			paramsObjects.add(paramsKeys.next().toString());
 		}
+		HashMap<String, String> val = new HashMap<>();
 
-		Object[] values = new Object[paramsObjects.size()];
-		HashMap<String, String> val = new HashMap<String, String>();
-
-		for (int i = 0; i < paramsObjects.size(); i++) {
-			try {
-				if (Authentication.bodyParams.get((String) paramsObjects.get(i)) != null
-						&& !Authentication.bodyParams.get((String) paramsObjects.get(i)).toString().isBlank())
-					val.put((String) paramsObjects.get(i),
-							Authentication.bodyParams.get((String) paramsObjects.get(i)).toString());
-
-				else
-					val.put("null", "null");
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+        for (String paramsObject : paramsObjects) {
+            try {
+                if (bodyParams.get( paramsObject) != null && !bodyParams.get(paramsObject).toString().isBlank())
+                    val.put( paramsObject, bodyParams.get( paramsObject).toString());
+                else
+                    val.put("null", "null");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
 		if (val.containsKey("null"))
 			return null;
@@ -198,12 +172,13 @@ public class Authentication extends HttpServlet {
 
 	}
 
-	public static boolean checkHeader() {
+	public static boolean checkHeader(HttpServletRequest request) {
+		org.json.JSONObject bodyParams = getBodyParams(request);
 		String email = null;
 		String pass = null;
 		try {
-			email = Authentication.bodyParams.get("email").toString();
-			pass = Authentication.bodyParams.get("password").toString();
+			email = bodyParams.get("email").toString();
+			pass = bodyParams.get("password").toString();
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -215,11 +190,8 @@ public class Authentication extends HttpServlet {
 
 	}
 
-//============================================================================	
-//	this function extracts to body of the request 
-//  and returns it as JSONObject	
-//============================================================================		
-	protected static org.json.JSONObject getBodyParams(HttpServletRequest request) {
+
+	static JSONObject getBodyParams(HttpServletRequest request) {
 		StringBuilder sb = new StringBuilder();
 		String line = null;
 		JSONObject json = null;
@@ -232,15 +204,11 @@ public class Authentication extends HttpServlet {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-
 		try {
 			json = new JSONObject(sb.toString());
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
 		return json;
-
 	}
-
 }
