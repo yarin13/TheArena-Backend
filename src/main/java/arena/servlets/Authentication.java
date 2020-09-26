@@ -159,6 +159,7 @@ public class Authentication extends HttpServlet {
             try {
                 if (bodyParams.get( paramsObject) != null && !bodyParams.get(paramsObject).toString().isBlank())
                     val.put( paramsObject, bodyParams.get( paramsObject).toString());
+                
                 else
                     val.put("null", "null");
             } catch (JSONException e) {
