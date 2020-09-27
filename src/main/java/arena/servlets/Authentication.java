@@ -19,7 +19,7 @@ import java.util.Map;
 public class Authentication extends HttpServlet {
 	/*
 	 * -----------------------------------------------Authentication-----------------------------------------------
-	 * To check if a single user is exists |GET: http://localhost:8080/TheArenaServlet/Authentication |Done
+	 * To check if a single user is exists |POST: http://localhost:8080/TheArenaServlet/Authentication |Done
 	 * To register a new user |POST:http://localhost:8080/TheArenaServlet/Authentication |Done
 	 * To reset a user password |PUT: http://localhost:8080/TheArenaServlet/Authentication |Done
 	 */
@@ -72,7 +72,6 @@ public class Authentication extends HttpServlet {
 			}
 			res = new org.json.simple.JSONObject(jsonMap);
 			response.getWriter().append(res.toJSONString());
-
 		}
 
 	}
@@ -95,7 +94,6 @@ public class Authentication extends HttpServlet {
 			mail = bodyParams.get("email").toString();
 			newPassword = bodyParams.get("newPassword").toString();
 		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -159,7 +157,7 @@ public class Authentication extends HttpServlet {
             try {
                 if (bodyParams.get( paramsObject) != null && !bodyParams.get(paramsObject).toString().isBlank())
                     val.put( paramsObject, bodyParams.get( paramsObject).toString());
-                
+
                 else
                     val.put("null", "null");
             } catch (JSONException e) {
@@ -173,28 +171,9 @@ public class Authentication extends HttpServlet {
 
 	}
 
-	public static boolean checkHeader(HttpServletRequest request) {
-		org.json.JSONObject bodyParams = getBodyParams(request);
-		String email = null;
-		String pass = null;
-		try {
-			email = bodyParams.get("email").toString();
-			pass = bodyParams.get("password").toString();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if (email != null)
-			return UsersManager.emailValidation(email) && pass != null && !pass.isBlank();
-		return false;
-
-	}
-
-
 	static JSONObject getBodyParams(HttpServletRequest request) {
 		StringBuilder sb = new StringBuilder();
-		String line = null;
+		String line;
 		JSONObject json = null;
 
 		BufferedReader reader;

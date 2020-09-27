@@ -76,12 +76,11 @@ public class PhotosServlet extends HttpServlet {
         JSONObject params = getBodyParams(request);
         Map<String, ArrayList<Integer>> jsonMap = new HashMap<>();
         org.json.simple.JSONObject res;
-
         String action = params.getString("action");
-        String mail = params.getString("email");
 
-        if (action.equals("photosIds")) {
+        if (action.equals("getPhotosIds")) {
             // return array of photos ids
+            String mail = params.getString("email");
             photosIds = PhotosManager.selectPhotosIds(mail);
             if (photosIds != null) {
                 // return the array with ids
@@ -95,7 +94,7 @@ public class PhotosServlet extends HttpServlet {
                 response.getWriter().append(res.toJSONString());
             }
 
-        } else if ("image".equals(action)) {
+        } else if (action.equals("getPhoto")) {
             // return photo matches the given id
             response.setContentType("image/jpeg");
             OutputStream os = response.getOutputStream();

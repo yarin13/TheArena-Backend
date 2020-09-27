@@ -64,40 +64,40 @@ public final class DBManager {
         }
     }
 
-    public static void selectImage(String query, OutputStream os) {
-        //============================================================================
-        // This function is used by the PhotosManager and used to get
-        // a specific photo from the DB.
-        //============================================================================
-        Statement pstmt = null;
-        Blob image;
-        byte[] imgData;
-        int i;
-        ResultSet rs;
-
-        try {
-            connection = DBManager.getConnection();
-            assert connection != null;
-            pstmt = connection.createStatement();
-            rs = pstmt.executeQuery(query);
-            if (rs.next()) {
-                image = rs.getBlob("photo");                        // getting image from database
-                imgData = image.getBytes(1, (int) image.length());  // extra info about image
-                os.write(imgData);                                    // sending the image
-            }
-            os.flush();
-            os.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (pstmt != null)
-                try {
-                    pstmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-        }
-    }
+//    public static void selectImage(String query, OutputStream os) {
+//        //============================================================================
+//        // This function is used by the PhotosManager and used to get
+//        // a specific photo from the DB.
+//        //============================================================================
+//        Statement pstmt = null;
+//        Blob image;
+//        byte[] imgData;
+//        int i;
+//        ResultSet rs;
+//
+//        try {
+//            connection = DBManager.getConnection();
+//            assert connection != null;
+//            pstmt = connection.createStatement();
+//            rs = pstmt.executeQuery(query);
+//            if (rs.next()) {
+//                image = rs.getBlob("photo");                        // getting image from database
+//                imgData = image.getBytes(1, (int) image.length());  // extra info about image
+//                os.write(imgData);                                    // sending the image
+//            }
+//            os.flush();
+//            os.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (pstmt != null)
+//                try {
+//                    pstmt.close();
+//                } catch (SQLException e) {
+//                    e.printStackTrace();
+//                }
+//        }
+//    }
 
     // -----------------------------Connection-----------------------------
 
