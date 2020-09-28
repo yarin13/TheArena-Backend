@@ -2,6 +2,7 @@ package arena.servlets;
 
 import arena.bll.UsersManager;
 import arena.bll.Users;
+import arena.dal.DBManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 import javax.servlet.annotation.WebServlet;
@@ -44,6 +45,7 @@ public class Authentication extends HttpServlet {
 			// register new user
 			if (checkParameters(bodyParams, response))
 				if (UsersManager.beforeInsertUser(bodyParams, response)) {
+
 					jsonMap.put("Success", "New user is created!");
 					res = new org.json.simple.JSONObject(jsonMap);
 					response.getWriter().append(res.toJSONString());
@@ -63,8 +65,6 @@ public class Authentication extends HttpServlet {
 					jsonMap.put("Error", "one or more fields are incorrect");
 				}
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				// e.printStackTrace();
 				jsonMap.put("Error", "one or more fields are missing");
 				res = new org.json.simple.JSONObject(jsonMap);
 				response.getWriter().append(res.toJSONString());

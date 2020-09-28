@@ -2,16 +2,9 @@ package arena.dal;
 
 import arena.bll.Users;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.http.HttpResponse;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 public final class DBManager {
 
@@ -58,6 +51,61 @@ public final class DBManager {
             if (statement != null)
                 try {
                     statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
+
+    public static void insertProfileImg(int userId ,InputStream image){
+        PreparedStatement pstmt = null;
+
+        String query = "UPDATE userProfilePic SET photo = (?) WHERE id = (?);";
+
+        try {
+            connection = DBManager.getConnection();
+            assert connection != null;
+            pstmt = connection.prepareStatement(query);
+            pstmt.setBinaryStream(1, image);
+            pstmt.setInt(2, userId);
+            pstmt.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (pstmt != null)
+                try {
+                    pstmt.close();
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
+    public static void insertImage(int userId, InputStream image) {
+        /*
+         * this function get a query and return the number of row in the result, mostly
+         * used on insert , update or delete queries
+         */
+        PreparedStatement pstmt = null;
+
+        String query = "INSERT INTO usersPhotos(userId,photo) VALUES (?, ?);";
+
+        try {
+            connection = DBManager.getConnection();
+            assert connection != null;
+            pstmt = connection.prepareStatement(query);
+            pstmt.setInt(1, userId);
+            pstmt.setBinaryStream(2, image);
+            pstmt.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (pstmt != null)
+                try {
+                    pstmt.close();
+
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -183,37 +231,6 @@ public final class DBManager {
 
     // ---------------------------------------------------------boolean---------------------------------------------------------
 
-    public static boolean insertImage(int userId, InputStream image) {
-        /*
-         * this function get a query and return the number of row in the result, mostly
-         * used on insert , update or delete queries
-         */
-        PreparedStatement pstmt = null;
-
-        String query = "INSERT INTO usersPhotos(userId,photo) VALUES (?, ?)";
-
-        try {
-            connection = DBManager.getConnection();
-            assert connection != null;
-            pstmt = connection.prepareStatement(query);
-            pstmt.setInt(1, userId);
-            pstmt.setBinaryStream(2, image);
-            System.out.println("testing");
-            return pstmt.execute();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (pstmt != null)
-                try {
-                    pstmt.close();
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-        }
-        return false;
-    }
 
     // ---------------------------------------------------------Users---------------------------------------------------------
 

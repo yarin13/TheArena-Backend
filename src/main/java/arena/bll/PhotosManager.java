@@ -23,23 +23,32 @@ public class PhotosManager {
     public static JSONObject json = new JSONObject();
 
 
-    public static void insertPhoto(String mail, InputStream image) {
+    public static void insertPhoto(String source, String mail, Integer id , InputStream image) {
         //============================================================================
         // This function is used by the PhotosServlet and is called
+        // with a source, if the source is fromPOST we will insert a photo to the userPhoto table,
+        // if the source is fromPUT we will set a new profile picture for the user (userProfilePic table).
         // for each image the user sends to the server,in order to upload it to the DB.
         //============================================================================
-        Users currentUser = UsersManager.returnUserId(mail);
-        assert currentUser != null;
-        DBManager.insertImage(currentUser.getId(), image);
+        switch (source) {
+            case ("fromPOST"):
+                Users currentUser = UsersManager.returnUserId(mail);
+                assert currentUser != null;
+                DBManager.insertImage(currentUser.getId(), image);
+                break;
+            case ("fromPUT"):
+                DBManager.insertProfileImg(id,image);
+                break;
+        }
+
     }
 
-    public static void selectPhoto(int id, OutputStream os) throws IOException {
+    public static void selectPhoto(String query, OutputStream os) throws IOException {
         //============================================================================
         // This function is used by the PhotosServlet and used to get
         // a specific photo from the DB.
         //============================================================================
         json.clear();
-        String query = String.format("SELECT photo FROM usersPhotos WHERE id = %d;", id);
         AtomicReference<InputStream> inputStream = new AtomicReference<>();
         DBManager.runSelect(query, rs -> {
             byte[] buffer = new byte[2048];
@@ -56,7 +65,6 @@ public class PhotosManager {
         });
         os.close();
         //DBManager.selectImage(query, os);
-
     }
 
     public static boolean deletePhoto(String mail, int photoId) {
