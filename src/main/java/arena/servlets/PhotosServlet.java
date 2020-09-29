@@ -1,31 +1,24 @@
 package arena.servlets;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import arena.bll.PhotosManager;
+import com.sun.jdi.ClassType;
+import com.sun.jdi.IntegerType;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-
-import arena.dal.DBManager;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import arena.bll.PhotosManager;
+import java.io.*;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Servlet implementation class Test
@@ -69,7 +62,7 @@ public class PhotosServlet extends HttpServlet {
         for (Part part : parts) {
             InputStream fileContent = part.getInputStream();
             if (!part.getName().equals("email"))
-                PhotosManager.insertPhoto("fromPOST", mail, null, fileContent);
+                PhotosManager.insertPhoto("fromPOST", mail, null, fileContent, response);
         }
     }
 
@@ -86,44 +79,72 @@ public class PhotosServlet extends HttpServlet {
         //============================================================================
         ArrayList<Integer> photosIds;
         JSONObject params = getBodyParams(request);
-        Map<String, ArrayList<Integer>> jsonMap = new HashMap<>();
-        org.json.simple.JSONObject res;
+        Map<String, ArrayList<Integer>> arrayListHashMap = new HashMap<>();
+        Map<String, String> jsonMap = new HashMap<>();
+        org.json.simple.JSONObject jsonObject;
         String action = params.getString("action");
 
         switch (action) {
             case "getPhotosIds": {
                 // return array of photos ids
-                String mail = params.getString("email");
-                photosIds = PhotosManager.selectPhotosIds(mail);
-                if (photosIds != null) {
-                    // return the array with ids
-                    jsonMap.put(mail, photosIds);
-                    res = new org.json.simple.JSONObject(jsonMap);
-                    response.getWriter().append(res.toJSONString());
-                } else {
-                    // return error saying no photos for that user
-                    jsonMap.put("Error", null);
-                    res = new org.json.simple.JSONObject(jsonMap);
-                    response.getWriter().append(res.toJSONString());
+                try {
+                    String mail = params.getString("email");
+                    photosIds = PhotosManager.selectPhotosIds(mail);
+                    if (photosIds != null) {
+                        // return the array with ids
+                        arrayListHashMap.put(mail, photosIds);
+                    } else {
+                        // return error saying no photos for that user
+                        arrayListHashMap.put("Error", null);
+                    }
+                    jsonObject = new org.json.simple.JSONObject(arrayListHashMap);
+                    response.getWriter().append(jsonObject.toJSONString());
+                }catch (Exception e){
+                    if (!params.has("email") || params.getString("email") == null || params.getString("email").equals("")) {
+                        jsonMap.put("Error", "Missing email or email is empty");
+                        jsonObject = new org.json.simple.JSONObject(jsonMap);
+                        response.setStatus(400);
+                        response.getWriter().append(jsonObject.toJSONString());
+                    }
                 }
                 break;
             }
             case "getPhoto": {
                 // return photo matches the given id
-                response.setContentType("image/jpeg");
-                OutputStream os = response.getOutputStream();
-                int photoId = params.getInt("photoId");
-                String query = String.format("SELECT photo FROM usersPhotos WHERE id = %d;", photoId);
-                PhotosManager.selectPhoto(query, os);
+                try {
+                    int photoId = params.getInt("photoId");
+                    String query = String.format("SELECT photo FROM usersPhotos WHERE id = %d;", photoId);
+                    response.setContentType("image/jpeg");
+                    OutputStream os = response.getOutputStream();
+                    PhotosManager.selectPhoto(query, os, response);
+                }catch (Exception e){
+                    if (!params.has("photoId") || params.getInt("photoId") == 0 || params.getString("photoId").equals("")) {
+                        jsonMap.put("Error", "Missing photoId or photoId is empty");
+                        jsonObject = new org.json.simple.JSONObject(jsonMap);
+                        response.setStatus(400);
+                        response.getWriter().append(jsonObject.toJSONString());
+                    }
+                }
                 break;
             }
             case "getProfilePhoto": {
                 //return profile photo from the userProfilePic table
-                response.setContentType("image/jpeg");
-                OutputStream os = response.getOutputStream();
-                String userId = params.getString("userId");
-                String query = String.format("SELECT photo FROM userProfilePic WHERE id = %s", userId);
-                PhotosManager.selectPhoto(query, os);
+                try {
+                    int userId = params.getInt("userId");
+                    String query = String.format("SELECT photo FROM userProfilePic WHERE id = %d", userId);
+                    response.setContentType("image/jpeg");
+                    OutputStream os = response.getOutputStream();
+                    PhotosManager.selectPhoto(query, os, response);
+
+                } catch (Exception e) {
+                    if (!params.has("userId") || params.getString("userId") == null || params.getString("userId").equals("")) {
+                        jsonMap.put("Error", "Missing userId or userId is empty");
+                        jsonObject = new org.json.simple.JSONObject(jsonMap);
+                        response.setStatus(400);
+                        response.getWriter().append(jsonObject.toJSONString());
+                    }
+
+                }
                 break;
             }
         }
@@ -134,16 +155,23 @@ public class PhotosServlet extends HttpServlet {
         // This function gets the params : "email" and "photoId" and deletes the photo from the DB.
         //============================================================================
         JSONObject params = getBodyParams(request);
+        org.json.simple.JSONObject jsonObject;
         Map<String, String> jsonMap = new HashMap<>();
 
         try {
             String mail = params.getString("email");
             int photoId = params.getInt("photoId");
-            if (PhotosManager.deletePhoto(mail, photoId))
+            if (PhotosManager.deletePhoto(mail, photoId)) {
                 jsonMap.put("Success", "Photo was deleted successfully");
-            else
+                response.setStatus(200);
+            } else {
                 jsonMap.put("Error", "Could not delete photo");
-        } catch (JSONException e1) {
+                response.setStatus(400);
+            }
+            jsonObject = new org.json.simple.JSONObject(jsonMap);
+            response.getWriter().append(jsonObject.toJSONString());
+
+        } catch (JSONException | IOException e1) {
             e1.printStackTrace();
         }
     }
@@ -159,7 +187,7 @@ public class PhotosServlet extends HttpServlet {
         for (Part part : parts) {
             if (part.getName().equals("newPhoto")) {
                 InputStream fileContent = part.getInputStream();
-                PhotosManager.insertPhoto("fromPUT",null,userId, fileContent);
+                PhotosManager.insertPhoto("fromPUT", null, userId, fileContent, response);
             }
         }
     }

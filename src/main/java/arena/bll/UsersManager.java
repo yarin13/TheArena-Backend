@@ -37,11 +37,11 @@ public final class UsersManager {
         // Email validation
         assert values != null;
         if (values.containsValue(null) || values.containsValue("null")) {
+            response.setStatus(400);
             jsonMapResponse.put("Error", "Something is missing");
             response.getWriter().append(new JSONObject(jsonMapResponse).toJSONString());
             return false;
         }
-        ;
         String mailTxt = values.get("email").toLowerCase();
         if (emailValidation(mailTxt)) {
             String query = String.format("Select email from users where email = '%s';", mailTxt);
@@ -49,6 +49,7 @@ public final class UsersManager {
                 return insertUser(new Users(mailTxt, values.get("firstName"), values.get("lastName"), values.get("phoneNumber"),
                         Integer.parseInt(values.get("age")), values.get("gender"), values.get("interestedIn"), Integer.parseInt(values.get("score"))), values.get("password"));
             else if (DBManager.isExists(query) == 1) {
+                response.setStatus(400);
                 jsonMapResponse.put("Error", "User already exists");
                 response.getWriter().append(new JSONObject(jsonMapResponse).toJSONString());
             }
@@ -142,27 +143,27 @@ public final class UsersManager {
                 + " passwords.userId = users.id where email = '%s' and hashedPassword = '%s';", emailTxt.toLowerCase(), p);
 
         if (DBManager.isExists(query) == 1) {
-            return returnUser(emailTxt.toLowerCase());
+            return returnUserId(emailTxt.toLowerCase());
         } else {
             return null;
         }
 
     }
 
-    private static Users returnUser(String emailTxt) {
-        /*
-         * This function get an email as an argument and first check if there is such a user in the DB.
-         * second it send a query to the GetUserInfo function.
-         */
-        String query = String.format(
-                "select email ,firstName ,lastName , phoneNumber, age, gender, interestedIn , score from users where email = '%s';",
-                emailTxt.toLowerCase());
-        if (DBManager.isExists(query) > 0) {
-            return DBManager.getUserInfo(query);
-        } else {
-            return null;
-        }
-    }
+//    private static Users returnUser(String emailTxt) {
+//        /*
+//         * This function get an email as an argument and first check if there is such a user in the DB.
+//         * second it send a query to the GetUserInfo function.
+//         */
+//        String query = String.format(
+//                "select email ,firstName ,lastName , phoneNumber, age, gender, interestedIn , score from users where email = '%s';",
+//                emailTxt.toLowerCase());
+//        if (DBManager.isExists(query) > 0) {
+//            return DBManager.getUserInfo(query);
+//        } else {
+//            return null;
+//        }
+//    }
 
     public static Users returnUserId(String emailTxt) {
         /*
@@ -178,5 +179,18 @@ public final class UsersManager {
         }
     }
 
+    public static Users returnUserId(int id) {
+        /*
+         * This function get an email as an argument and first check if there is such a user in the DB.
+         * second it send a query to the GetUserInfo function.
+         */
+        String query = String.format(
+                "select * from users where email = %d;", id);
+        if (DBManager.isExists(query) > 0) {
+            return DBManager.getUserInfoWithId(query);
+        } else {
+            return null;
+        }
+    }
 
 }

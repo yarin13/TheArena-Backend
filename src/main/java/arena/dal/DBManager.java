@@ -57,7 +57,9 @@ public final class DBManager {
         }
     }
 
-    public static void insertProfileImg(int userId ,InputStream image){
+    // ---------------------------------------------------------boolean---------------------------------------------------------
+
+    public static boolean insertProfileImg(int userId, InputStream image) {
         PreparedStatement pstmt = null;
 
         String query = "UPDATE userProfilePic SET photo = (?) WHERE id = (?);";
@@ -69,20 +71,21 @@ public final class DBManager {
             pstmt.setBinaryStream(1, image);
             pstmt.setInt(2, userId);
             pstmt.execute();
-
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         } finally {
             if (pstmt != null)
                 try {
                     pstmt.close();
-
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
         }
     }
-    public static void insertImage(int userId, InputStream image) {
+
+    public static boolean insertImage(int userId, InputStream image) {
         /*
          * this function get a query and return the number of row in the result, mostly
          * used on insert , update or delete queries
@@ -98,14 +101,14 @@ public final class DBManager {
             pstmt.setInt(1, userId);
             pstmt.setBinaryStream(2, image);
             pstmt.execute();
-
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         } finally {
             if (pstmt != null)
                 try {
                     pstmt.close();
-
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -228,9 +231,6 @@ public final class DBManager {
         }
         return -1;
     }
-
-    // ---------------------------------------------------------boolean---------------------------------------------------------
-
 
     // ---------------------------------------------------------Users---------------------------------------------------------
 

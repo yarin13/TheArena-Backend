@@ -1,29 +1,23 @@
 package arena.bll;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import arena.dal.DBManager;
+import org.json.simple.JSONObject;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.servlet.http.Part;
-
-import org.json.simple.JSONObject;
-
-import arena.dal.DBManager;
 
 public class PhotosManager {
 
     public static JSONObject json = new JSONObject();
 
-
-    public static void insertPhoto(String source, String mail, Integer id , InputStream image) {
+    public static void insertPhoto(String source, String mail, Integer id , InputStream image, HttpServletResponse res) throws IOException {
         //============================================================================
         // This function is used by the PhotosServlet and is called
         // with a source, if the source is fromPOST we will insert a photo to the userPhoto table,
@@ -34,15 +28,17 @@ public class PhotosManager {
             case ("fromPOST"):
                 Users currentUser = UsersManager.returnUserId(mail);
                 assert currentUser != null;
-                DBManager.insertImage(currentUser.getId(), image);
+                responseHandler(res,DBManager.insertImage(currentUser.getId(), image));
                 break;
             case ("fromPUT"):
-                DBManager.insertProfileImg(id,image);
+                Users users = UsersManager.returnUserId(id);
+                assert users != null;
+                responseHandler(res,DBManager.insertProfileImg(users.getId(),image));
                 break;
         }
     }
 
-    public static void selectPhoto(String query, OutputStream os) throws IOException {
+    public static void selectPhoto(String query, OutputStream os,HttpServletResponse response) throws IOException {
         //============================================================================
         // This function is used by the PhotosServlet and used to get
         // a specific photo from the DB.
@@ -59,6 +55,7 @@ public class PhotosManager {
                     os.write(buffer, 0, bytesRead);
                 }
             } catch (Exception e) {
+                response.setStatus(204);
                 e.printStackTrace();
             }
         });
@@ -100,5 +97,21 @@ public class PhotosManager {
             return photosIds;
         }
         return null;
+    }
+
+    public static void responseHandler(HttpServletResponse response, boolean isSuccess) throws IOException {
+        HashMap<String,String> map = new HashMap<>();
+        JSONObject jsonObject;
+        if (isSuccess){
+            map.put("status","success");
+            jsonObject = new JSONObject(map);
+            response.getWriter().append(jsonObject.toJSONString());
+            response.setStatus(200);
+        }else{
+            map.put("status","unSuccessful");
+            jsonObject = new JSONObject(map);
+            response.getWriter().append(jsonObject.toJSONString());
+            response.setStatus(400);
+        }
     }
 }
