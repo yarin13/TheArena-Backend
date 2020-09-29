@@ -40,7 +40,6 @@ public class PhotosManager {
                 DBManager.insertProfileImg(id,image);
                 break;
         }
-
     }
 
     public static void selectPhoto(String query, OutputStream os) throws IOException {
