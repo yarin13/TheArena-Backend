@@ -33,6 +33,7 @@ import arena.bll.PhotosManager;
 @MultipartConfig
 public class PhotosServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    
 
     /**
      * @see HttpServlet#HttpServlet()
@@ -48,12 +49,13 @@ public class PhotosServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+    	
         //============================================================================
         // This function gets a parameter called "email" and photo or photos to upload to the DB.
         //============================================================================
         Collection<Part> parts = request.getParts();
         String mail = request.getParameter("email");
-
+        System.out.println("trying upload"+mail);
         for (Part part : parts) {
             InputStream fileContent = part.getInputStream();
             if (!part.getName().equals("email"))

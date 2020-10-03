@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 public final class DBManager {
 
     private final static String USERNAME = "root";
-    private final static String PASSWORD = "Katte963!";
+    private final static String PASSWORD = null;
     private final static String URL = "jdbc:mysql://localhost:3306/TheArena?useSSL=false";
 
     private static Connection connection = null;
