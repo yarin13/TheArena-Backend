@@ -2,10 +2,7 @@ package arena.bll;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -129,8 +126,40 @@ public final class UsersManager {
 
     }
 
-    //----------------------------------------Users----------------------------------------
+    public static boolean blockedUser(int user,int userToBlock){
+        if (user != 0 && userToBlock != 0) {
+            if (DBManager.isExists(String.format("SELECT id from users where id = %d",user)) > 0 && DBManager.isExists(String.format("SELECT id FROM users WHERE id = %d",userToBlock)) > 0){
+                return DBManager.runExecute(String.format("INSERT INTO blocked (userId, blockedUserId) values (%d , %d)", user, userToBlock)) > 0;
+            }
+        }
+        return false;
+    }
 
+    public static boolean removeBlock(int userId,int userToRemove){
+        if (DBManager.isExists(String.format("SELECT id from users where id = %d",userId)) > 0 && DBManager.isExists(String.format("SELECT id FROM users WHERE id = %d",userToRemove)) > 0){
+            return DBManager.runExecute(String.format("DELETE FROM blocked WHERE userId = %d AND blockedUserId = %d;",userId,userToRemove)) > 0;
+        }
+        return false;
+    }
+
+    //---------------------------------ArrayList<Integer>--------------------------------
+
+    public static ArrayList<Integer> getMyBlockedUsersList(int userId){
+        ArrayList<Integer> usersArrayList = new ArrayList<>();
+        if (userId != 0){
+            DBManager.runSelect(String.format("SELECT blockedUserId FROM blocked WHERE userId = %d",userId),resultSet -> {
+                try {
+                    usersArrayList.add(resultSet.getInt("blockedUserId"));
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            });
+        }
+
+        return usersArrayList;
+    }
+
+    //----------------------------------------Users----------------------------------------
     public static Users checkAuthentication(String emailTxt, String password) {
         /*
          * This function get an email and password and check if there is a such
