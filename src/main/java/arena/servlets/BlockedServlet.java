@@ -88,7 +88,7 @@ public class BlockedServlet extends HttpServlet {
         Map<String, String> jsonMap = new HashMap<>();
 
         if (status == 200){
-            jsonMap.put("Success",String.format("Successfully blocked user %d",args[0]));
+            jsonMap.put("Success",String.format("Successfully blocked user %d",args[1]));
         }else if (status == 400){
             jsonMap.put("Error",String.format("Could not found user with the id of: %d",args[1]));
         }else if (status == 410){
