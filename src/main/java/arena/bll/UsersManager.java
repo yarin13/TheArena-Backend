@@ -210,11 +210,11 @@ public final class UsersManager {
 
     public static Users returnUserId(int id) {
         /*
-         * This function get an email as an argument and first check if there is such a user in the DB.
+         * This function get an id as an argument and first check if there is such a user in the DB.
          * second it send a query to the GetUserInfo function.
          */
         String query = String.format(
-                "select * from users where email = %d;", id);
+                "select * from users where id = %d;", id);
         if (DBManager.isExists(query) > 0) {
             return DBManager.getUserInfoWithId(query);
         } else {
