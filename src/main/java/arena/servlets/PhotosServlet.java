@@ -153,17 +153,16 @@ public class PhotosServlet extends HttpServlet {
             case "getProfilePhoto": {
                 //return profile photo from the userProfilePic table
                 try {
-<<<<<<< HEAD
+
                     int userId = Integer.parseInt(params.getString("userId"));
                     System.out.println(userId);
-=======
+
                     int userId;
                     if (request.getIntHeader("userId") == 0 || request.getIntHeader("userId") == -1)  {
                         throw new InvalidObjectException("userId is null or 0");
                     }else
                         userId = request.getIntHeader("userId");
 
->>>>>>> branch 'master' of https://github.com/Almog1339/TheArenaServlet.git
                     String query = String.format("SELECT photo FROM userProfilePic WHERE id = %d", userId);
                     response.setContentType("image/jpeg");
                     OutputStream os = response.getOutputStream();
