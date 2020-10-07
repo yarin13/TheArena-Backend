@@ -131,7 +131,8 @@ public class PhotosServlet extends HttpServlet {
             case "getProfilePhoto": {
                 //return profile photo from the userProfilePic table
                 try {
-                    int userId = params.getInt("userId");
+                    int userId = Integer.parseInt(params.getString("userId"));
+                    System.out.println(userId);
                     String query = String.format("SELECT photo FROM userProfilePic WHERE id = %d", userId);
                     response.setContentType("image/jpeg");
                     OutputStream os = response.getOutputStream();
