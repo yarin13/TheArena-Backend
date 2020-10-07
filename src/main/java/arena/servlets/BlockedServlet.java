@@ -38,22 +38,21 @@ public class BlockedServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        JSONObject jsonObject = Authentication.getBodyParams(request);
-        HashMap<String,String> map = Authentication.checkParameters(jsonObject);
-        assert map != null;
-        int user = Integer.parseInt(map.get("userId"));
-
+        int user;
+        if (!request.getHeader("userId").isEmpty())
+            user = Integer.parseInt(request.getHeader("userId"));
+        else {
+            responseHandler(response, 417, null);
+            return;
+        }
         ArrayList<Integer> userArray = UsersManager.getMyBlockedUsersList(user);
 
         if (userArray.size() == 0){
             response.setStatus(204);
         }else{
             org.json.simple.JSONObject res;
-            Map<String, String> jsonMap = new HashMap<>();
-
-            for (int u:userArray) {
-                jsonMap.put("UserId",String.valueOf(u));
-            }
+            Map<String, ArrayList<Integer>> jsonMap = new HashMap<>();
+            jsonMap.put("UserIds",userArray);
             res = new org.json.simple.JSONObject(jsonMap);
             response.setStatus(200);
             response.getWriter().append(res.toJSONString());
