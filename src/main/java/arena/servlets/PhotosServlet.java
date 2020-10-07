@@ -1,6 +1,7 @@
 package arena.servlets;
 
 import arena.bll.PhotosManager;
+import com.sun.jdi.request.ExceptionRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 import javax.servlet.ServletException;
@@ -10,10 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,6 +35,7 @@ public class PhotosServlet extends HttpServlet {
     // getProfilePhoto & userId - return a user profile picture.
     //
     private static final long serialVersionUID = 1L;
+    private Object NullPointerException;
 
     /**
      * @see HttpServlet#HttpServlet()
@@ -77,17 +76,34 @@ public class PhotosServlet extends HttpServlet {
         //if the value of that key is: "image" the client gets the photo he requested by sending the id of that photo
         //============================================================================
         ArrayList<Integer> photosIds;
-        JSONObject params = getBodyParams(request);
         Map<String, ArrayList<Integer>> arrayListHashMap = new HashMap<>();
         Map<String, String> jsonMap = new HashMap<>();
         org.json.simple.JSONObject jsonObject;
-        String action = params.getString("action");
+        String action;
+        try{
+            if (request.getHeader("action") == null || request.getHeader("action").isEmpty())
+                throw new Exception("no action is found!");
+            else {
+                action = request.getHeader("action");
+            }
+        }
+        catch (Exception e){
+            if (e.getMessage().equals("no action is found!"))
+                response.setStatus(400);
+
+            return;
+        }
 
         switch (action) {
             case "getPhotosIds": {
                 // return array of photos ids
                 try {
-                    String mail = params.getString("email");
+                    String mail;
+                    if (request.getHeader("email").isEmpty() || request.getHeader("email").isBlank()){
+                        throw new InvalidObjectException("email is empty or null");
+                    }else
+                        mail = request.getHeader("email");
+
                     photosIds = PhotosManager.selectPhotosIds(mail);
                     if (photosIds != null) {
                         // return the array with ids
@@ -98,26 +114,29 @@ public class PhotosServlet extends HttpServlet {
                     }
                     jsonObject = new org.json.simple.JSONObject(arrayListHashMap);
                     response.getWriter().append(jsonObject.toJSONString());
-                }catch (Exception e){
-                    if (!params.has("email") || params.getString("email") == null || params.getString("email").equals("")) {
+                }catch (NullPointerException e){
                         jsonMap.put("Error", "Missing email or email is empty");
                         jsonObject = new org.json.simple.JSONObject(jsonMap);
                         response.setStatus(400);
                         response.getWriter().append(jsonObject.toJSONString());
-                    }
                 }
                 break;
             }
             case "getPhoto": {
                 // return photo matches the given id
                 try {
-                    int photoId = params.getInt("photoId");
+                    int photoId;
+                    if (request.getIntHeader("photoId") == 0){
+                        throw new InvalidObjectException("photoId is null or 0");
+                    }else
+                        photoId = request.getIntHeader("photoId");
+
                     String query = String.format("SELECT photo FROM usersPhotos WHERE id = %d;", photoId);
                     response.setContentType("image/jpeg");
                     OutputStream os = response.getOutputStream();
                     PhotosManager.selectPhoto(query, os, response);
-                }catch (Exception e){
-                    if (!params.has("photoId") || params.getInt("photoId") == 0 || params.getString("photoId").equals("")) {
+                }catch (NullPointerException e){
+                    if (e.getMessage().equals("photoId is null or 0")) {
                         jsonMap.put("Error", "Missing photoId or photoId is empty");
                         jsonObject = new org.json.simple.JSONObject(jsonMap);
                         response.setStatus(400);
@@ -129,19 +148,29 @@ public class PhotosServlet extends HttpServlet {
             case "getProfilePhoto": {
                 //return profile photo from the userProfilePic table
                 try {
-                    int userId = params.getInt("userId");
+                    int userId;
+                    if (request.getIntHeader("userId") == 0 || request.getIntHeader("userId") == -1)  {
+                        throw new InvalidObjectException("userId is null or 0");
+                    }else
+                        userId = request.getIntHeader("userId");
+
                     String query = String.format("SELECT photo FROM userProfilePic WHERE id = %d", userId);
                     response.setContentType("image/jpeg");
                     OutputStream os = response.getOutputStream();
                     PhotosManager.selectPhoto(query, os, response);
 
-                } catch (Exception e) {
-                    if (!params.has("userId") || params.getString("userId") == null || params.getString("userId").equals("")) {
+                } catch (NullPointerException e) {
+                    if (e.getMessage().equals("userId is null or 0")) {
                         jsonMap.put("Error", "Missing userId or userId is empty");
                         jsonObject = new org.json.simple.JSONObject(jsonMap);
                         response.setStatus(400);
                         response.getWriter().append(jsonObject.toJSONString());
                     }
+                }catch (Exception e){
+                    jsonMap.put("Error", "Please check your request");
+                    jsonObject = new org.json.simple.JSONObject(jsonMap);
+                    response.setStatus(400);
+                    response.getWriter().append(jsonObject.toJSONString());
                 }
                 break;
             }
