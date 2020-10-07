@@ -142,7 +142,6 @@ public class PhotosServlet extends HttpServlet {
                         response.setStatus(400);
                         response.getWriter().append(jsonObject.toJSONString());
                     }
-
                 }
                 break;
             }
