@@ -35,11 +35,7 @@ public class PhotosServlet extends HttpServlet {
     // getProfilePhoto & userId - return a user profile picture.
     //
     private static final long serialVersionUID = 1L;
-<<<<<<< HEAD
-    
-=======
     private Object NullPointerException;
->>>>>>> branch 'master' of https://github.com/Almog1339/TheArenaServlet.git
 
     /**
      * @see HttpServlet#HttpServlet()
@@ -55,13 +51,12 @@ public class PhotosServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    	
         //============================================================================
         // This function gets a parameter called "email" and photo or photos to the userPhoto table.
         //============================================================================
         Collection<Part> parts = request.getParts();
         String mail = request.getParameter("email");
-        System.out.println("trying upload"+mail);
+
         for (Part part : parts) {
             InputStream fileContent = part.getInputStream();
             if (!part.getName().equals("email"))
@@ -85,6 +80,7 @@ public class PhotosServlet extends HttpServlet {
         Map<String, String> jsonMap = new HashMap<>();
         org.json.simple.JSONObject jsonObject;
         String action;
+        System.out.println(request.getHeader("action") + " " +request.getIntHeader("userId") );
         try{
             if (request.getHeader("action") == null || request.getHeader("action").isEmpty())
                 throw new Exception("no action is found!");
@@ -153,10 +149,6 @@ public class PhotosServlet extends HttpServlet {
             case "getProfilePhoto": {
                 //return profile photo from the userProfilePic table
                 try {
-
-                    int userId = Integer.parseInt(params.getString("userId"));
-                    System.out.println(userId);
-
                     int userId;
                     if (request.getIntHeader("userId") == 0 || request.getIntHeader("userId") == -1)  {
                         throw new InvalidObjectException("userId is null or 0");
