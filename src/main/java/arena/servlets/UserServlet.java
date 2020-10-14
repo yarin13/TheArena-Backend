@@ -53,7 +53,6 @@ public class UserServlet extends HttpServlet {
 			userDetails.put("age", String.valueOf(currentUser.getAge()));
 			userDetails.put("gender", currentUser.getGender());
 			userDetails.put("interestedIn", currentUser.getInterestedIn());
-			
 		}
 		else
 		{
@@ -62,7 +61,6 @@ public class UserServlet extends HttpServlet {
 		}
 		
 		response.getWriter().append(new JSONObject(userDetails).toJSONString());
-		
 	}
 
 	/**
