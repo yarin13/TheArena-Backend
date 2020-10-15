@@ -51,6 +51,7 @@ public final class DBManager {
             if (statement != null)
                 try {
                     statement.close();
+                    closeConnection();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -79,6 +80,7 @@ public final class DBManager {
             if (pstmt != null)
                 try {
                     pstmt.close();
+                    closeConnection();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -109,6 +111,7 @@ public final class DBManager {
             if (pstmt != null)
                 try {
                     pstmt.close();
+                    closeConnection();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -200,6 +203,7 @@ public final class DBManager {
                 try {
 
                     statement.close();
+                    closeConnection();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -225,6 +229,7 @@ public final class DBManager {
             if (statement != null)
                 try {
                     statement.close();
+                    closeConnection();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
