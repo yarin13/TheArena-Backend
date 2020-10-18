@@ -38,37 +38,38 @@ public class UserServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		int userId = Integer.parseInt(request.getParameter("userId"));
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		HashMap<String,String> userDetails = new HashMap<>();
-		Users currentUser = UsersManager.returnUserId(userId);
-		if(currentUser != null)
-		{
-			response.setStatus(200);
-			userDetails.put("email", currentUser.getEmail());
-			userDetails.put("firstName", currentUser.getFirstName());
-			userDetails.put("lastName", currentUser.getLastName());
-			userDetails.put("phoneNumber", currentUser.getPhoneNumber());
-			userDetails.put("age", String.valueOf(currentUser.getAge()));
-			userDetails.put("gender", currentUser.getGender());
-			userDetails.put("interestedIn", currentUser.getInterestedIn());
+		try {
+			String header = request.getHeader("userId");
+			if (header.equals("") || header.isEmpty() || header.isBlank())
+				throw new Exception();
+
+			int userId = Integer.parseInt(header);
+
+			Users currentUser = UsersManager.returnUserId(userId);
+			if(currentUser != null)
+			{
+				userDetails.put("email", currentUser.getEmail());
+				userDetails.put("firstName", currentUser.getFirstName());
+				userDetails.put("lastName", currentUser.getLastName());
+				userDetails.put("phoneNumber", currentUser.getPhoneNumber());
+				userDetails.put("age", String.valueOf(currentUser.getAge()));
+				userDetails.put("gender", currentUser.getGender());
+				userDetails.put("interestedIn", currentUser.getInterestedIn());
+
+				response.setStatus(200);
+			}
+			else
+				throw new Exception();
+
 		}
-		else
-		{
+		catch (Exception e){
 			response.setStatus(400);
 			userDetails.put("Error", "Couldn't find user");
+		}finally {
+			response.getWriter().append(new JSONObject(userDetails).toJSONString());
 		}
-		
-		response.getWriter().append(new JSONObject(userDetails).toJSONString());
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
 	}
 
 }
