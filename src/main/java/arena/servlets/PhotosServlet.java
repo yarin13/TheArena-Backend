@@ -146,7 +146,7 @@ public class PhotosServlet extends HttpServlet {
                     response.setContentType("image/jpeg");
                     OutputStream os = response.getOutputStream();
                     PhotosManager.selectPhoto(query, os, response);
-                }catch (NullPointerException e){
+                }catch (Exception e){
                     if (e.getMessage().equals("photoId is null or 0")) {
                         jsonMap.put("Error", "Missing photoId or photoId is empty");
                         jsonObject = new org.json.simple.JSONObject(jsonMap);
@@ -170,13 +170,7 @@ public class PhotosServlet extends HttpServlet {
                     OutputStream os = response.getOutputStream();
                     PhotosManager.selectPhoto(query, os, response);
 
-                } catch (NullPointerException e) {
-                    if (e.getMessage().equals("userId is null or 0")) {
-                        jsonMap.put("Error", "Missing userId or userId is empty");
-                        jsonObject = new org.json.simple.JSONObject(jsonMap);
-                        response.setStatus(400);
-                        response.getWriter().append(jsonObject.toJSONString());
-                    }
+          
                 }catch (Exception e){
                     jsonMap.put("Error", "Please check your request");
                     jsonObject = new org.json.simple.JSONObject(jsonMap);
