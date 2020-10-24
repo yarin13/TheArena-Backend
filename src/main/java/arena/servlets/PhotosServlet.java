@@ -54,13 +54,24 @@ public class PhotosServlet extends HttpServlet {
         //============================================================================
         // This function gets a parameter called "email" and photo or photos to the userPhoto table.
         //============================================================================
+    	Map<String, String> jsonMap = new HashMap<>();
+    	org.json.simple.JSONObject jsonObject;
         Collection<Part> parts = request.getParts();
         String mail = request.getParameter("email");
 
         for (Part part : parts) {
             InputStream fileContent = part.getInputStream();
             if (!part.getName().equals("email"))
-                PhotosManager.insertPhoto("fromPOST", mail, null, fileContent, response);
+            	 if(part.getSize() > 0)
+            	 {
+            		 PhotosManager.insertPhoto("fromPOST", mail, null, fileContent, response);	 
+            	 }
+                 else
+                 {
+                 	jsonMap.put("Error", "Please select a photo to upload");
+                 	jsonObject = new org.json.simple.JSONObject(jsonMap);
+                 	response.getWriter().append(jsonObject.toJSONString());
+                 }
         }
     }
 
@@ -80,7 +91,6 @@ public class PhotosServlet extends HttpServlet {
         Map<String, String> jsonMap = new HashMap<>();
         org.json.simple.JSONObject jsonObject;
         String action;
-        System.out.println(request.getHeader("action") + " " +request.getIntHeader("userId") );
         try{
             if (request.getHeader("action") == null || request.getHeader("action").isEmpty())
                 throw new Exception("no action is found!");
@@ -127,10 +137,10 @@ public class PhotosServlet extends HttpServlet {
                 // return photo matches the given id
                 try {
                     int photoId;
-                    if (request.getIntHeader("photoId") == 0){
+                    if (Integer.parseInt(request.getHeader("photoId")) == 0){
                         throw new InvalidObjectException("photoId is null or 0");
                     }else
-                        photoId = request.getIntHeader("photoId");
+                        photoId = Integer.parseInt(request.getHeader("photoId"));
 
                     String query = String.format("SELECT photo FROM usersPhotos WHERE id = %d;", photoId);
                     response.setContentType("image/jpeg");
@@ -210,12 +220,22 @@ public class PhotosServlet extends HttpServlet {
         // This function gets the params : "userId" for the userID, and a "newPhoto".
         // We use this function to update user profile picture.
         //============================================================================
+    	Map<String, String> jsonMap = new HashMap<>();
+    	org.json.simple.JSONObject jsonObject;
         Collection<Part> parts = request.getParts();
         int userId = Integer.parseInt(request.getParameter("userId"));
         for (Part part : parts) {
             if (part.getName().equals("newPhoto")) {
                 InputStream fileContent = part.getInputStream();
-                PhotosManager.insertPhoto("fromPUT", null, userId, fileContent, response);
+                if(part.getSize() > 0)
+                	PhotosManager.insertPhoto("fromPUT", null, userId, fileContent, response);
+                else
+                {
+                	jsonMap.put("Error", "Please select a photo to upload");
+                	jsonObject = new org.json.simple.JSONObject(jsonMap);
+                	response.getWriter().append(jsonObject.toJSONString());
+                }
+                
             }
         }
     }

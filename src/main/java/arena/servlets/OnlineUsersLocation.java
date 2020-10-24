@@ -90,12 +90,14 @@ public class OnlineUsersLocation extends HttpServlet {
 		try {
 			mail = params.get("email").toString();
 			LocationManager.logOutUser(mail);
+			jsonMap.put("Success", "Success");
 		} catch (JSONException e) {
 			jsonMap.put("Error", "Missing some fields");
-			res = new JSONObject(jsonMap);
-			jsonResponse.add(res);
-			response.getWriter().append(jsonResponse.toJSONString());
+
 		}
+		res = new JSONObject(jsonMap);
+		jsonResponse.add(res);
+		response.getWriter().append(jsonResponse.toJSONString());
 	}
 
 
