@@ -89,7 +89,7 @@ public class UserServlet extends HttpServlet {
 			 }
 			 else
 			 {
-				 resault.put("firstNameError", "firstName");
+				 resault.put("Error", "Couldn't update firstName");
 			 }
 		 }
 		 if(params.has("lastName"))
@@ -101,7 +101,7 @@ public class UserServlet extends HttpServlet {
 			 }
 			 else
 			 {
-				 resault.put("lastNameError", "lastName");
+				 resault.put("Error", "Couldn't update lastName");
 			 }
 		 }
 		 if(params.has("phoneNumber"))
@@ -113,56 +113,20 @@ public class UserServlet extends HttpServlet {
 			 }
 			 else
 			 {
-				 resault.put("phoneNumberError", "phoneNumber");
+				 resault.put("Error", "Couldn't update phoneNumber");
 			 }
 			 
-		 }
-		 if(params.has("age"))
-		 {
-			 int age = Integer.parseInt(params.getString("age"));
-			 if(UsersManager.updateAge(userId,age) != -1)
-			 {
-				 resault.put("Success", "Success");
-			 }
-			 else
-			 {
-				 resault.put("ageError", "age");
-			 }
-		 }
-		 if(params.has("gender"))
-		 {
-			 String gender = params.getString("gender").toLowerCase();
-			 if(UsersManager.updateGender(userId,gender) != -1)
-			 {
-				 resault.put("Success", "Success");
-			 }
-			 else
-			 {
-				 resault.put("genderError", "gender");
-			 }
-		 }
-		 if(params.has("interestedIn"))
-		 {
-			 String interestedIn = params.getString("interestedIn").toLowerCase();
-			 if(UsersManager.updateInterestedIn(userId,interestedIn) != -1)
-			 {
-				 resault.put("Success", "Success");
-			 }
-			 else
-			 {
-				 resault.put("interestedInError", "interestedIn");
-			 }
 		 }
 		 if(params.has("email"))
 		 {
 			 String email = params.getString("email").toLowerCase();
-			 if(UsersManager.updateUserEmail(userId,email) != -1)
+			 if(UsersManager.updateUserEmail(userId,email) != -1 )
 			 {
 				 resault.put("Success", "Success");
 			 }
 			 else
 			 {
-				 resault.put("emailError", "email");
+				 resault.put("Error", "Couldn't update email");
 			 }
 			 
 		 }

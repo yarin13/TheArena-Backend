@@ -240,23 +240,6 @@ public final class UsersManager {
 		return DBManager.runExecute(query);
 	}
 
-	public static int updateAge(int userId, int age) {
-		// TODO Auto-generated method stub
-		String query = String.format("update users Set age = %d where id = %d;", age,userId);
-		return DBManager.runExecute(query);
-	}
-
-	public static int updateGender(int userId, String gender) {
-		// TODO Auto-generated method stub
-		String query = String.format("update users Set gender = '%s' where id = %d;", gender,userId);
-		return DBManager.runExecute(query);
-	}
-
-	public static int updateInterestedIn(int userId, String interestedIn) {
-		// TODO Auto-generated method stub
-		String query = String.format("update users Set interestedIn = '%s' where id = %d;", interestedIn,userId);
-		return DBManager.runExecute(query);
-	}
 
 	public static int updateUserEmail(int userId, String email) {
 		// TODO Auto-generated method stub
