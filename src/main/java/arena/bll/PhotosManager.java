@@ -26,6 +26,7 @@ public class PhotosManager {
         //============================================================================
         switch (source) {
             case ("fromPOST"):
+            	System.out.println("");
                 Users currentUser = UsersManager.returnUserId(mail);
                 assert currentUser != null;
                 responseHandler(res,DBManager.insertImage(currentUser.getId(), image));

@@ -59,6 +59,7 @@ public class PhotosServlet extends HttpServlet {
         Collection<Part> parts = request.getParts();
         String mail = request.getParameter("email");
 
+        
         for (Part part : parts) {
             InputStream fileContent = part.getInputStream();
             if (!part.getName().equals("email"))
